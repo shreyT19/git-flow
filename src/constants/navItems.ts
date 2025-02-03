@@ -8,7 +8,7 @@ const NAV_ITEMS = [
   },
   {
     title: "Q&A",
-    url: "/qa",
+    url: "/qna",
     icon: Bot,
   },
   {
