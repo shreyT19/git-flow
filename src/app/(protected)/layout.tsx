@@ -11,7 +11,7 @@ const SideBarLayout = ({ children }: Props) => {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <main className="m-2 w-full">
+      <main className="m-2 flex w-full flex-col gap-4">
         <div className="flex items-center gap-2 rounded-lg border border-sidebar-border bg-sidebar p-2 px-4 shadow">
           {/* <Searchbar/>  */}
           <div className="ml-auto">
@@ -19,7 +19,6 @@ const SideBarLayout = ({ children }: Props) => {
           </div>
           {/* Main Content */}
         </div>
-        <div className="h-4"></div>
         <div className="h-[calc(100dvh-6rem)] overflow-y-auto rounded-lg border border-sidebar-border bg-sidebar p-2 px-4 shadow">
           {children}
         </div>
