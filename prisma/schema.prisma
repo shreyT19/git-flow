@@ -13,15 +13,22 @@ datasource db {
 model User {
     id       String     @id @default(cuid())
     createdAt DateTime    @default(now())
-    updatedAt DateTime    @default(now())
+    updatedAt DateTime    @updatedAt
 
     imageURL  String?
     firstName String?
     lastName String?
     emailAddress String @unique
+    credits Int @default(250)   
+}
 
-    credits Int @default(250)
+model Project{
+    id       String     @id @default(cuid())
+    createdAt DateTime    @default(now())
+    updatedAt DateTime    @updatedAt
 
-    
-    
+    name      String
+    githubUrl String
+
+    deletedAt DateTime?
 }
