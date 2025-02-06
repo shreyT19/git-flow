@@ -1,9 +1,19 @@
 import { z } from "zod";
 
-export const createProjectValidationSchema = z.object({
-  repoUrl: z.string().url({ message: "That doesn't look like a valid URL 🧐" }),
-  projectName: z
-    .string()
-    .min(1, { message: "Looks like you forgot to enter a name 🫣" }),
-  githubToken: z.string().optional(),
-});
+export const createProjectValidationSchema = z
+  .object({
+    githubUrl: z.string().optional(),
+    name: z
+      .string()
+      .min(1, { message: "Looks like you forgot to enter a name 🫣" }),
+    githubToken: z.string().optional(),
+  })
+
+  .refine((data) => data?.githubUrl || data?.githubToken, {
+    message: "Either GitHub URL or GitHub Token is required 🧐",
+    path: ["githubUrl"],
+  })
+  .refine((data) => !(data.githubUrl && data.githubToken), {
+    message: "Provide either GitHub URL or GitHub Token, not both 🫣",
+    path: ["githubUrl"],
+  });
