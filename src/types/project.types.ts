@@ -1,5 +1,5 @@
 export interface ICreateProject {
-  repoUrl: string;
-  projectName: string;
+  name: string;
+  githubUrl: string;
   githubToken: string;
 }
