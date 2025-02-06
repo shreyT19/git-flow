@@ -6,11 +6,12 @@
  * TL;DR - This is where all the tRPC server stuff is created and plugged in. The pieces you will
  * need to use are documented accordingly near the end.
  */
-import { initTRPC } from "@trpc/server";
+import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
 
 import { db } from "@/server/db";
+import { auth } from "@clerk/nextjs/server";
 
 /**
  * 1. CONTEXT
@@ -74,6 +75,29 @@ export const createCallerFactory = t.createCallerFactory;
 export const createTRPCRouter = t.router;
 
 /**
+ * Public (unauthenticated) procedure
+ * You can use this is you want to allow anyone to query a piece of information.
+ * This is useful for public data like a fetching or creating a project .
+ */
+
+const isAuthenticated = t.middleware(async ({ next, ctx }) => {
+  const user = await auth();
+  if (!user) {
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+      message:
+        "Looks like you aren't logged in 🧐. Please log in to continue 😃.",
+    });
+  }
+  return next({
+    ctx: {
+      ...ctx,
+      user,
+    },
+  });
+});
+
+/**
  * Middleware for timing procedure execution and adding an artificial delay in development.
  *
  * You can remove this if you don't like it, but it can help catch unwanted waterfalls by simulating
@@ -104,3 +128,10 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
  * are logged in.
  */
 export const publicProcedure = t.procedure.use(timingMiddleware);
+
+/**
+ * Protected (authenticated) procedure
+ * This is the base piece you use to build new queries and mutations on your tRPC API. It does
+ * guarantee that a user querying is logged in, and will throw an error if they are not.
+ */
+export const privateProcedure = t.procedure.use(isAuthenticated);
