@@ -36,3 +36,9 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
 - [ ] Fetch Project by id and show in detail page
 - [ ] Show something different on the dashboard page
 - [ ] Make app feel smoother/Add attention to detail
+
+## Config Settings
+
+- [ ] Allow users to add their LLM API keys for the AI
+- [ ] Ask before auto-polling commits when a project is added, may be a configuration
+- [ ] Guided Onboarding for new users, showing them how they can use the app
