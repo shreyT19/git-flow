@@ -7,15 +7,27 @@ import { type SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createProjectValidationSchema } from "@/utils/project.utils";
 import { Button } from "@/components/ui/button";
+import { api } from "@/trpc/react";
+import { toast } from "sonner";
 
 const CreateProjectPage = () => {
   const { register, handleSubmit, reset, formState } = useForm<ICreateProject>({
     resolver: zodResolver(createProjectValidationSchema),
   });
-  console.log(formState.errors);
 
-  const onFormSubmit: SubmitHandler<ICreateProject> = (data) => {
-    console.log(data);
+  const createProject = api.project.createProject.useMutation();
+
+  const onFormSubmit: SubmitHandler<ICreateProject> = async (data) => {
+    createProject.mutate(data, {
+      onSuccess: () => {
+        toast.success("Wohoo! Project created successfully 🎉");
+        reset();
+      },
+      onError: (error) =>
+        toast.error(
+          `There was an error creating the project 😢 : ${error?.message}`,
+        ),
+    });
   };
 
   return (
@@ -38,16 +50,16 @@ const CreateProjectPage = () => {
           className="flex flex-col gap-4"
         >
           <Input
-            {...register("projectName")}
+            {...register("name")}
             placeholder="Project Name"
-            description={formState.errors.projectName?.message}
+            description={formState.errors.name?.message}
             descriptionClassName="!text-red-500 text-s"
           />
           <Input
-            {...register("repoUrl")}
+            {...register("githubUrl")}
             type="url"
             placeholder="Repository URL"
-            description={formState.errors.repoUrl?.message}
+            description={formState.errors.githubUrl?.message}
             descriptionClassName="!text-red-500 text-s"
           />
           <Input
@@ -56,7 +68,11 @@ const CreateProjectPage = () => {
             description={formState.errors.githubToken?.message}
             descriptionClassName="!text-red-500 text-s"
           />
-          <Button className="w-fit" type="submit">
+          <Button
+            className="w-fit"
+            type="submit"
+            disabled={createProject.isPending}
+          >
             Create Project
           </Button>
         </form>
