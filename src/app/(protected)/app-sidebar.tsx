@@ -14,34 +14,19 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import NAV_ITEMS from "@/constants/navItems";
+import useProject from "@/services/project";
 import { cn } from "@/utils/tailwind.utils";
 import { Plus, Workflow } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
 
-const projects = [
-  {
-    name: "Starter Project",
-  },
-  {
-    name: "Best Project",
-  },
-  {
-    name: "Worst Project",
-  },
-  {
-    name: "Intermediate Project",
-  },
-  {
-    name: "Professional Project",
-  },
-];
-
 const AppSidebar = () => {
   const pathName = usePathname();
 
   const { open } = useSidebar();
+
+  const { projects, selectedProjectId, setSelectedProjectId } = useProject();
 
   return (
     <Sidebar variant="floating" collapsible="icon">
@@ -81,20 +66,26 @@ const AppSidebar = () => {
           <SidebarGroupContent>
             <SidebarMenu>
               {projects?.map((project, index) => (
-                <SidebarMenuItem key={index}>
+                <SidebarMenuItem
+                  key={index}
+                  onClick={() => setSelectedProjectId(project?.id)}
+                >
                   <SidebarMenuButton asChild>
                     <div>
                       <div
                         className={cn(
                           "flex size-6 items-center justify-center rounded-sm border text-sm text-primary",
-                          { "bg-primary text-white": true === true },
+                          {
+                            "bg-primary text-white":
+                              project?.id === selectedProjectId,
+                          },
                           { "w-8": !open },
                         )}
                       >
-                        {project.name[0]}
+                        {project?.name?.[0]}
                       </div>
                       <ConditionalWrapper show={open}>
-                        {project.name}
+                        {project?.name}
                       </ConditionalWrapper>
                     </div>
                   </SidebarMenuButton>

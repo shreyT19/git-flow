@@ -27,3 +27,12 @@ You can check out the [create-t3-app GitHub repository](https://github.com/t3-os
 ## How do I deploy this?
 
 Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+
+## Improvements to make
+
+- [ ] Use React Query for data fetching
+- [ ] Use Cypress for E2E testing
+- [ ] Use React Testing Library for unit testing
+- [ ] Fetch Project by id and show in detail page
+- [ ] Show something different on the dashboard page
+- [ ] Make app feel smoother/Add attention to detail
