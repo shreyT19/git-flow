@@ -9,6 +9,7 @@ import { createProjectValidationSchema } from "@/utils/project.utils";
 import { Button } from "@/components/ui/button";
 import { api } from "@/trpc/react";
 import { toast } from "sonner";
+import useRefetch from "@/hooks/useRefetch";
 
 const CreateProjectPage = () => {
   const { register, handleSubmit, reset, formState } = useForm<ICreateProject>({
@@ -16,11 +17,15 @@ const CreateProjectPage = () => {
   });
 
   const createProject = api.project.createProject.useMutation();
+  const refetch = useRefetch();
 
   const onFormSubmit: SubmitHandler<ICreateProject> = async (data) => {
     createProject.mutate(data, {
       onSuccess: () => {
         toast.success("Wohoo! Project created successfully 🎉");
+        refetch().catch(() => {
+          console.error("There was an error refetching the projects 😢");
+        });
         reset();
       },
       onError: (error) =>
