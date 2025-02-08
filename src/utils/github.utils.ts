@@ -12,7 +12,7 @@ import type {
 import { Octokit } from "octokit";
 import { generateCommitSummaryFromAI } from "./ai.utils";
 
-export const octokit = new Octokit({
+const octokit = new Octokit({
   auth: process.env.GITHUB_TOKEN,
 });
 
@@ -22,9 +22,7 @@ export const octokit = new Octokit({
  * @param githubUrl
  * @returns
  */
-export const getCommitHashes = async (
-  githubUrl: string,
-): Promise<IBaseCommit[]> => {
+const getCommitHashes = async (githubUrl: string): Promise<IBaseCommit[]> => {
   const [owner, repo] = githubUrl.split("/").slice(-2) as string[];
 
   if (!owner || !repo) {
@@ -49,61 +47,9 @@ export const getCommitHashes = async (
       commitMessage: commit?.commit?.message ?? "",
       commitAuthorAvatar: commit?.commit?.author?.avatar_url ?? "",
       commitAuthorName: commit?.commit?.author?.name ?? "",
-      commitDate: commit?.commit?.author?.data ?? "",
+      commitDate: commit?.commit?.author?.date ?? "",
     }));
   return sanitizedCommits;
-};
-
-/**
- *  Poll commits from a github url
- * @description: Poll commits from a github url and return the commit hashes as an array of strings in the format of \'commitHash: commitMessage\'.
- * @param projectId
- * @returns
- */
-export const pollCommits = async (projectId: string) => {
-  //* Get the project by id
-  const project = await getProjectById(projectId);
-
-  //! Check if the project has a github url
-  if (!project?.githubUrl) {
-    throw new Error("Project does not have a github url 🧐");
-  }
-
-  //* Get the commit hashes from the github url
-  const commitHashes = await getCommitHashes(project?.githubUrl);
-
-  //* Filter out the commits that have already been processed
-  const unprocessedCommits = await filterUnprocessedCommits(
-    projectId,
-    commitHashes,
-  );
-
-  //* Summarize the commits, returns a list of promises
-  const summaryPromises = await Promise.allSettled(
-    unprocessedCommits?.map((commit) =>
-      summarizeCommit(project?.githubUrl, commit?.commitHash!),
-    ),
-  );
-
-  //* Map the summaries to the commits
-  const summaries = summaryPromises?.map((response) => {
-    if (response?.status == "fulfilled") {
-      return response?.value! as string;
-    }
-    return "";
-  });
-
-  //* Sanitize the commits data
-  const commits = unprocessedCommits?.map((commit, index) => {
-    return {
-      ...commit,
-      projectId,
-      summary: summaries?.[index],
-    };
-  }) as ICreateCommit[];
-
-  //* Create the commits
-  return await createBulkCommits(commits);
 };
 
 /**
@@ -158,3 +104,57 @@ const summarizeCommit = async (
     return null;
   }
 };
+
+/**
+ *  Poll commits from a github url
+ * @description: Poll commits from a github url and return the commit hashes as an array of strings in the format of \'commitHash: commitMessage\'.
+ * @param projectId
+ * @returns
+ */
+const pollCommits = async (projectId: string) => {
+  //* Get the project by id
+  const project = await getProjectById(projectId);
+
+  //! Check if the project has a github url
+  if (!project?.githubUrl) {
+    throw new Error("Project does not have a github url 🧐");
+  }
+
+  //* Get the commit hashes from the github url
+  const commitHashes = await getCommitHashes(project?.githubUrl);
+
+  //* Filter out the commits that have already been processed
+  const unprocessedCommits = await filterUnprocessedCommits(
+    projectId,
+    commitHashes,
+  );
+
+  //* Summarize the commits, returns a list of promises
+  const summaryPromises = await Promise.allSettled(
+    unprocessedCommits?.map((commit) =>
+      summarizeCommit(project?.githubUrl, commit?.commitHash!),
+    ),
+  );
+
+  //* Map the summaries to the commits
+  const summaries = summaryPromises?.map((response) => {
+    if (response?.status == "fulfilled") {
+      return response?.value as string;
+    }
+    return "";
+  });
+
+  //* Sanitize the commits data
+  const commits = unprocessedCommits?.map((commit, index) => {
+    return {
+      ...commit,
+      projectId,
+      summary: summaries?.[index],
+    };
+  }) as ICreateCommit[];
+
+  //* Create the commits
+  return await createBulkCommits(commits);
+};
+
+export default pollCommits;
