@@ -45,7 +45,7 @@ const getCommitHashes = async (githubUrl: string): Promise<IBaseCommit[]> => {
     .map((commit: any) => ({
       commitHash: commit?.sha,
       commitMessage: commit?.commit?.message ?? "",
-      commitAuthorAvatar: commit?.commit?.author?.avatar_url ?? "",
+      commitAuthorAvatar: commit?.author?.avatar_url ?? "",
       commitAuthorName: commit?.commit?.author?.name ?? "",
       commitDate: commit?.commit?.author?.date ?? "",
     }));
