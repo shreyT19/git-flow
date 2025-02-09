@@ -1,6 +1,7 @@
 import { createTRPCRouter, privateProcedure } from "@/server/api/trpc";
 import pollCommits from "@/utils/github.utils";
 import { createProjectValidationSchema } from "@/utils/project.utils";
+import { z } from "zod";
 
 export const projectRouter = createTRPCRouter({
   createProject: privateProcedure
@@ -34,4 +35,17 @@ export const projectRouter = createTRPCRouter({
       },
     });
   }),
+  getCommits: privateProcedure
+    .input(
+      z.object({
+        projectId: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      return await ctx.db.commit.findMany({
+        where: {
+          projectId: input?.projectId,
+        },
+      });
+    }),
 });
