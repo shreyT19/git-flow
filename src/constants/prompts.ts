@@ -1,4 +1,6 @@
-const BASE_PROMPT = `You are an expert programmer, and you are trying to summarize a git diff.
+export const COMMIT_MESSAGE_PROMPT = (
+  diff: string,
+): string => `You are an expert programmer, and you are trying to summarize a git diff.
 Reminders about the git diff format:
 For every file, there are a fen metadata lines, like (for example):
 \'\'\'
@@ -26,11 +28,25 @@ The last comment does not include the file names.
 because there were more than two relevant files in the hypothetical commit.
 Do not include parts of the example in your summary.
 It is given only as an example of appropriate comments.
-Please summarise the following diff file:`;
+Please summarise the following diff file: \n\n${diff}`;
 
-export default function getPrompt(
-  customMetadata: string,
-  basePrompt: string = BASE_PROMPT,
-) {
-  return `${basePrompt} \n\n${customMetadata}`;
-}
+export const SUMMARIZE_CODE_PROMPT = (
+  fileSource: string,
+  code: string,
+): string => `
+You are an experienced senior software engineer specializing in onboarding junior developers onto projects.  
+
+Your task is to help a junior engineer understand the purpose and functionality of the \`${fileSource}\` file.  
+
+### Code:  
+\`\`\`  
+${code}  
+\`\`\`  
+
+### Instructions:  
+- Provide a concise and clear summary of what this file does.  
+- Keep the explanation within **150 words**.  
+- Focus on the **main purpose**, **key functions**, and **important concepts** used in the code.  
+
+Respond with the summary only, without additional commentary.
+`;
