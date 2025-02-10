@@ -10,7 +10,7 @@ import type {
   ICreateCommit,
 } from "@/types/commit.types";
 import { Octokit } from "octokit";
-import { generateCommitSummaryFromAI } from "./ai.utils";
+import { generateCommitSummaryUsingLLM } from "./ai.utils";
 
 const octokit = new Octokit({
   auth: process.env.GITHUB_TOKEN,
@@ -98,7 +98,7 @@ const summarizeCommit = async (
       },
     );
 
-    return await generateCommitSummaryFromAI(gitCommitDiff);
+    return await generateCommitSummaryUsingLLM(gitCommitDiff);
   } catch (error) {
     console.error("Error summarizing commit:", error);
     return null;
