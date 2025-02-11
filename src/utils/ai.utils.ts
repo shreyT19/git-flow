@@ -21,10 +21,15 @@ export const generateCommitSummaryUsingLLM = async (diff: string) => {
 };
 
 export const summarizeCodeUsingLLM = async (doc: IDocument) => {
-  const code = doc?.pageContent?.slice(0, 10000); // limit to 10k characters to avoid token limit
-  const prompt = SUMMARIZE_CODE_PROMPT(doc?.metadata?.source, code);
-  const response = await generativeLLMModel.generateContent(prompt);
-  return response.response.text();
+  try {
+    const code = doc?.pageContent?.slice(0, 10000); // limit to 10k characters to avoid token limit
+    const prompt = SUMMARIZE_CODE_PROMPT(doc?.metadata?.source, code);
+    const response = await generativeLLMModel.generateContent(prompt);
+    return response.response.text();
+  } catch (err) {
+    console.error(err);
+    return "";
+  }
 };
 
 export const generateEmbeddingsUsingLLM = async (summary: string) => {
