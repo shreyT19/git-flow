@@ -1,4 +1,5 @@
 import { createTRPCRouter, privateProcedure } from "@/server/api/trpc";
+import { indexGithubRepo } from "@/utils/github-loader.utils";
 import pollCommits from "@/utils/github.utils";
 import { createProjectValidationSchema } from "@/utils/project.utils";
 import { z } from "zod";
@@ -18,6 +19,13 @@ export const projectRouter = createTRPCRouter({
           },
         },
       });
+
+      //* Auto Index Github Repo
+      await indexGithubRepo(
+        projects?.id,
+        input?.githubUrl ?? "",
+        input?.githubToken,
+      );
 
       //* Auto Poll Commits
       await pollCommits(projects?.id);
