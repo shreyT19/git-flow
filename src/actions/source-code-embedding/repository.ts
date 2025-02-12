@@ -1,7 +1,10 @@
 "use server";
 
 import { db } from "@/server/db";
-import type { ICreateSourceCodeEmbedding } from "@/types/sourceCodeEmbedding.types";
+import type {
+  ICreateSourceCodeEmbedding,
+  ISourceCodeEmbeddingBase,
+} from "@/types/sourceCodeEmbedding.types";
 
 /**
  *  Adds a new source code embedding to the database.
@@ -27,4 +30,20 @@ export const addSourceCodeEmbedding = async (
   WHERE id = ${sourceCodeEmbedding.id}
   `;
   return sourceCodeEmbedding;
+};
+
+export const getSimilarSourceCodeEmbeddingsFromVector = async (
+  vector: string,
+  projectId: string,
+): Promise<ISourceCodeEmbeddingBase[]> => {
+  // CosineSimilarity - is a measure of similarity between two non-zero vectors of an inner product space
+  return await db.$queryRaw`
+  SELECT *,
+  1 - ("summaryEmbedding" <=> ${vector}::vector) AS cosineSimilarity 
+  FROM "SourceCodeEmbedding"
+  WHERE 1 - ("summaryEmbedding" <=> ${vector}::vector) > 0.5
+  AND "projectId" = ${projectId}
+  ORDER BY cosineSimilarity DESC
+  LIMIT 10
+  `;
 };
