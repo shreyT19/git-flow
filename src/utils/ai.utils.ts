@@ -4,6 +4,7 @@ import {
   SUMMARIZE_CODE_PROMPT,
 } from "@/constants/prompts";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { retryWithExponentialBackoff } from "./server.utils";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
@@ -15,17 +16,31 @@ const embeddingLLMModel = genAI.getGenerativeModel({
 });
 
 export const generateCommitSummaryUsingLLM = async (diff: string) => {
-  const prompt = COMMIT_MESSAGE_PROMPT(diff);
-  const response = await generativeLLMModel.generateContent(prompt);
-  return response.response.text();
+  try {
+    const prompt = COMMIT_MESSAGE_PROMPT(diff);
+    const operation = async () => {
+      const response = await generativeLLMModel.generateContent(prompt);
+      return response.response.text();
+    };
+
+    return await retryWithExponentialBackoff(operation);
+  } catch (err) {
+    console.error(err);
+    return "";
+  }
 };
 
 export const summarizeCodeUsingLLM = async (doc: IDocument) => {
   try {
     const code = doc?.pageContent?.slice(0, 10000); // limit to 10k characters to avoid token limit
     const prompt = SUMMARIZE_CODE_PROMPT(doc?.metadata?.source, code);
-    const response = await generativeLLMModel.generateContent(prompt);
-    return response.response.text();
+
+    const operation = async () => {
+      const response = await generativeLLMModel.generateContent(prompt);
+      return response.response.text();
+    };
+
+    return await retryWithExponentialBackoff(operation);
   } catch (err) {
     console.error(err);
     return "";
