@@ -1,7 +1,10 @@
-export interface ICreateSourceCodeEmbedding {
+export interface ISourceCodeEmbeddingBase {
+  fileName: string;
   sourceCode: string;
   summary: string;
-  fileName: string;
+}
+
+export interface ICreateSourceCodeEmbedding extends ISourceCodeEmbeddingBase {
   projectId: string;
   summaryEmbedding: number[];
 }
