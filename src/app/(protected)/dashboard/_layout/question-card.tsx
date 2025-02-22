@@ -8,25 +8,58 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import useProject from "@/services/project";
+import type { ISourceCodeEmbeddingBase } from "@/types/sourceCodeEmbedding.types";
+import { askQuestion } from "@/utils/streaming.utils";
+import { readStreamableValue } from "ai/rsc";
 import React, { useState } from "react";
 
 const QuestionCard = () => {
+  const { selectedProjectDetails } = useProject();
   const [question, setQuestion] = useState<string>("");
   const [open, setOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [fileReferences, setFileReferences] =
+    useState<ISourceCodeEmbeddingBase[]>();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const [answer, setAnswer] = useState<string>("");
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const projectId = selectedProjectDetails?.id;
     e.preventDefault();
-    // console.log(question);
+    if (!projectId) return;
+    setLoading(true);
     setOpen(true);
+
+    const { stream, fileReferences } = await askQuestion(question, projectId);
+    setFileReferences(fileReferences);
+
+    for await (const chunk of readStreamableValue(stream)) {
+      if (chunk) {
+        setAnswer((ans) => ans + chunk);
+      }
+    }
+
+    setLoading(false);
   };
 
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
+        <DialogContent className="max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>GitFlow</DialogTitle>
           </DialogHeader>
+          {answer}
+          <h1>File References</h1>
+          {fileReferences?.map((fileReference) => {
+            return (
+              <div key={fileReference.fileName}>
+                <h1>{fileReference.fileName}</h1>
+                <pre>{fileReference.sourceCode}</pre>
+              </div>
+            );
+          })}
         </DialogContent>
       </Dialog>
 
