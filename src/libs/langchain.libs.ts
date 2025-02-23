@@ -1,6 +1,9 @@
 import type { IDocument } from "@/types/langchain.types";
 import { GithubRepoLoader } from "@langchain/community/document_loaders/web/github";
-import { generateEmbeddingsUsingLLM, summarizeCodeUsingLLM } from "./ai.utils";
+import {
+  generateEmbeddingsUsingLLM,
+  summarizeCodeUsingLLM,
+} from "./llmSdk.libs";
 import { addSourceCodeEmbedding } from "@/actions/source-code-embedding/repository";
 
 const loadGithubRepo = async (githubUrl: string, githubToken?: string) => {

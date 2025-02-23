@@ -8,8 +8,8 @@ import {
   getQuestionsByProjectId,
 } from "@/actions/question/repository";
 import { createTRPCRouter, privateProcedure } from "@/server/api/trpc";
-import { indexGithubRepo } from "@/utils/github-loader.utils";
-import pollCommits from "@/utils/github.utils";
+import { indexGithubRepo } from "@/libs/langchain.libs";
+import pollCommits from "@/libs/githubOctokit.libs";
 import {
   getProjectIdSchema,
   createProjectValidationSchema,

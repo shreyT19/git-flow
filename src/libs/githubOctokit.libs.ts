@@ -10,7 +10,7 @@ import type {
   ICreateCommit,
 } from "@/types/commit.types";
 import { Octokit } from "octokit";
-import { generateCommitSummaryUsingLLM } from "./ai.utils";
+import { generateCommitSummaryUsingLLM } from "./llmSdk.libs";
 
 const octokit = new Octokit({
   auth: process.env.GITHUB_TOKEN,

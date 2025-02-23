@@ -118,6 +118,7 @@ model Meeting{
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
+    name String
     meetingUrl String // AppWrite storage url
     projectId String
     project Project @relation(fields:[projectId],references:[id])

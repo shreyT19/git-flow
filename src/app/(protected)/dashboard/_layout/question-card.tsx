@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import useProject from "@/services/project";
 import type { ISourceCodeEmbeddingBase } from "@/types/sourceCodeEmbedding.types";
-import { askQuestion } from "@/utils/streaming.utils";
+import { askQuestion } from "@/libs/streamingSDK.libs";
 import { readStreamableValue } from "ai/rsc";
 import React, { useState } from "react";
 import { SaveIcon } from "lucide-react";

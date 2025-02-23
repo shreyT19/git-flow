@@ -1,7 +1,7 @@
 import ConditionalWrapper from "@/components/global/ConditionalWrapper";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { uploadFileToAppWrite } from "@/utils/appwrite.utils";
+import { uploadFileToAppWrite } from "@/libs/appwrite.libs";
 import { PresentationIcon, Upload } from "lucide-react";
 import React, { useState } from "react";
 import { useDropzone } from "react-dropzone";

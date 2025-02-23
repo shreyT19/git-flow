@@ -3,7 +3,7 @@
 import { streamText } from "ai";
 import { createStreamableValue } from "ai/rsc";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
-import { generateEmbeddingsUsingLLM } from "./ai.utils";
+import { generateEmbeddingsUsingLLM } from "./llmSdk.libs";
 import { getSimilarSourceCodeEmbeddingsFromVector } from "@/actions/source-code-embedding/repository";
 import { ASK_QUESTION_PROMPT } from "@/constants/prompts";
 

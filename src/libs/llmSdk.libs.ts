@@ -4,7 +4,7 @@ import {
   SUMMARIZE_CODE_PROMPT,
 } from "@/constants/prompts";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { retryWithExponentialBackoff } from "./server.utils";
+import { retryWithExponentialBackoff } from "../utils/server.utils";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
