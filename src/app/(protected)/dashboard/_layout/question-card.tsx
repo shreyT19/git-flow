@@ -15,6 +15,9 @@ import { readStreamableValue } from "ai/rsc";
 import React, { useState } from "react";
 import MDEditor from "@uiw/react-md-editor";
 import CodeReferences from "./code-references";
+import { SaveIcon, Workflow } from "lucide-react";
+import { api } from "@/trpc/react";
+import { toast } from "sonner";
 
 const QuestionCard = () => {
   const { selectedProjectDetails } = useProject();
@@ -45,6 +48,23 @@ const QuestionCard = () => {
     setLoading(false);
   };
 
+  const saveAnswer = api.project.saveAnswer.useMutation();
+
+  const handleSaveAnswer = async () => {
+    saveAnswer.mutate(
+      {
+        projectId: selectedProjectDetails?.id ?? "",
+        question,
+        answer,
+        fileReferences: fileReferences ?? [],
+      },
+      {
+        onSuccess: () => toast.success("Answer saved successfully"),
+        onError: (error) => toast.error(error.message),
+      },
+    );
+  };
+
   return (
     <>
       <Dialog
@@ -58,7 +78,21 @@ const QuestionCard = () => {
       >
         <DialogContent className="max-h-[80dvh] overflow-y-auto sm:max-w-[80dvw]">
           <DialogHeader>
-            <DialogTitle>GitFlow</DialogTitle>
+            <div className="flex items-center gap-3">
+              <DialogTitle className="flex items-center gap-2">
+                <Workflow className="h-4 w-4" />
+                GitFlow
+              </DialogTitle>
+              <Button
+                variant="outline"
+                className="mr-4 flex items-center gap-2"
+                onClick={handleSaveAnswer}
+                disabled={saveAnswer.isPending}
+              >
+                <SaveIcon className="h-4 w-4" />
+                Save Answer
+              </Button>
+            </div>
           </DialogHeader>
           <div data-color-mode="light" className="flex flex-col gap-4">
             <MDEditor.Markdown source={answer} />
