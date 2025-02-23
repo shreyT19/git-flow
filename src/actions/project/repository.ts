@@ -51,5 +51,12 @@ export const getProjectsByUserId = async (userId: string) => {
       },
       deletedAt: null,
     },
+    include: {
+      userToProjects: {
+        include: {
+          user: true,
+        },
+      },
+    },
   });
 };

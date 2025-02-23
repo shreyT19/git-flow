@@ -3,13 +3,18 @@ import {
   createProject,
   getProjectsByUserId,
 } from "@/actions/project/repository";
-import { saveAnswer } from "@/actions/question/repository";
+import {
+  saveAnswer,
+  getQuestionsByProjectId,
+} from "@/actions/question/repository";
 import { createTRPCRouter, privateProcedure } from "@/server/api/trpc";
 import { indexGithubRepo } from "@/utils/github-loader.utils";
 import pollCommits from "@/utils/github.utils";
-import { createProjectValidationSchema } from "@/utils/project.utils";
+import {
+  getProjectIdSchema,
+  createProjectValidationSchema,
+} from "@/utils/project.utils";
 import { createQuestionValidationSchema } from "@/utils/question.utils";
-import { z } from "zod";
 
 export const projectRouter = createTRPCRouter({
   createProject: privateProcedure
@@ -32,11 +37,7 @@ export const projectRouter = createTRPCRouter({
     async ({ ctx }) => await getProjectsByUserId(ctx.user.userId!),
   ),
   getCommits: privateProcedure
-    .input(
-      z.object({
-        projectId: z.string(),
-      }),
-    )
+    .input(getProjectIdSchema)
     .query(async ({ input }) => {
       //* Auto Poll Commits for newer commits
       await pollCommits(input?.projectId)
@@ -51,5 +52,10 @@ export const projectRouter = createTRPCRouter({
     .input(createQuestionValidationSchema)
     .mutation(
       async ({ ctx, input }) => await saveAnswer(ctx.user.userId!, input),
+    ),
+  getQuestions: privateProcedure
+    .input(getProjectIdSchema)
+    .query(
+      async ({ input }) => await getQuestionsByProjectId(input?.projectId),
     ),
 });

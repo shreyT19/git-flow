@@ -19,3 +19,7 @@ export const createProjectValidationSchema = z
   });
 
 export type IProjectBase = z.infer<typeof createProjectValidationSchema>;
+
+export const getProjectIdSchema = z.object({
+  projectId: z.string(),
+});

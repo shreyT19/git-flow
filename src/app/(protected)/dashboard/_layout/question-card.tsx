@@ -1,23 +1,17 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import useProject from "@/services/project";
 import type { ISourceCodeEmbeddingBase } from "@/types/sourceCodeEmbedding.types";
 import { askQuestion } from "@/utils/streaming.utils";
 import { readStreamableValue } from "ai/rsc";
 import React, { useState } from "react";
-import MDEditor from "@uiw/react-md-editor";
-import CodeReferences from "./code-references";
-import { SaveIcon, Workflow } from "lucide-react";
+import { SaveIcon } from "lucide-react";
 import { api } from "@/trpc/react";
 import { toast } from "sonner";
+import FileReferences from "./file-references";
+import useRefetch from "@/hooks/useRefetch";
 
 const QuestionCard = () => {
   const { selectedProjectDetails } = useProject();
@@ -49,6 +43,7 @@ const QuestionCard = () => {
   };
 
   const saveAnswer = api.project.saveAnswer.useMutation();
+  const refetch = useRefetch();
 
   const handleSaveAnswer = async () => {
     saveAnswer.mutate(
@@ -59,48 +54,22 @@ const QuestionCard = () => {
         fileReferences: fileReferences ?? [],
       },
       {
-        onSuccess: () => toast.success("Answer saved successfully"),
-        onError: (error) => toast.error(error.message),
+        onSuccess: () => {
+          toast.success("Answer saved successfully 🎉");
+          refetch().catch(() => {
+            console.error("There was an error refetching the projects 😢");
+          });
+        },
+        onError: (error) =>
+          toast.error(
+            `There was an error saving the answer 😢 : ${error?.message}`,
+          ),
       },
     );
   };
 
   return (
     <>
-      <Dialog
-        open={open}
-        onOpenChange={() => {
-          setOpen(false);
-          setAnswer("");
-          setFileReferences([]);
-          setQuestion("");
-        }}
-      >
-        <DialogContent className="max-h-[80dvh] overflow-y-auto sm:max-w-[80dvw]">
-          <DialogHeader>
-            <div className="flex items-center gap-3">
-              <DialogTitle className="flex items-center gap-2">
-                <Workflow className="h-4 w-4" />
-                GitFlow
-              </DialogTitle>
-              <Button
-                variant="outline"
-                className="mr-4 flex items-center gap-2"
-                onClick={handleSaveAnswer}
-                disabled={saveAnswer.isPending}
-              >
-                <SaveIcon className="h-4 w-4" />
-                Save Answer
-              </Button>
-            </div>
-          </DialogHeader>
-          <div data-color-mode="light" className="flex flex-col gap-4">
-            <MDEditor.Markdown source={answer} />
-            <CodeReferences fileReferences={fileReferences} />
-          </div>
-        </DialogContent>
-      </Dialog>
-
       <Card className="col-span-3">
         <CardHeader>
           <CardTitle>Ask a question</CardTitle>
@@ -118,6 +87,28 @@ const QuestionCard = () => {
           </form>
         </CardContent>
       </Card>
+      <FileReferences
+        open={open}
+        onOpenChange={() => {
+          setOpen(false);
+          setAnswer("");
+          setFileReferences([]);
+          setQuestion("");
+        }}
+        sheetHeader={
+          <Button
+            variant="outline"
+            className="mr-4 flex items-center gap-2"
+            onClick={handleSaveAnswer}
+            disabled={saveAnswer.isPending}
+          >
+            <SaveIcon className="h-4 w-4" />
+            Save Answer
+          </Button>
+        }
+        fileReferences={fileReferences ?? []}
+        answer={answer}
+      />
     </>
   );
 };

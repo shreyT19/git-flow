@@ -20,3 +20,30 @@ export const saveAnswer = async (userId: string, question: IQuestionBase) => {
     },
   });
 };
+
+/**
+ * Get questions by project ID
+ * @param projectId - The project's ID
+ * @returns The questions
+ */
+export const getQuestionsByProjectId = async (projectId: string) => {
+  return await db.question.findMany({
+    where: {
+      projectId: projectId,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          imageURL: true,
+          emailAddress: true,
+        },
+      },
+    },
+  });
+};

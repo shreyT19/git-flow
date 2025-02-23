@@ -4,6 +4,7 @@ import { api } from "@/trpc/react";
 import type { ICommitResponse } from "@/types/commit.types";
 import type { IProjectResponse } from "@/types/project.types";
 import { cn } from "@/utils/tailwind.utils";
+import MDEditor from "@uiw/react-md-editor";
 import { ExternalLink } from "lucide-react";
 import Link from "next/link";
 import React from "react";
