@@ -1,62 +1,55 @@
+import { getCommitsByProjectId } from "@/actions/commit/repository";
+import {
+  createProject,
+  getProjectsByUserId,
+} from "@/actions/project/repository";
+import { saveAnswer } from "@/actions/question/repository";
 import { createTRPCRouter, privateProcedure } from "@/server/api/trpc";
 import { indexGithubRepo } from "@/utils/github-loader.utils";
 import pollCommits from "@/utils/github.utils";
 import { createProjectValidationSchema } from "@/utils/project.utils";
+import { createQuestionValidationSchema } from "@/utils/question.utils";
 import { z } from "zod";
 
 export const projectRouter = createTRPCRouter({
   createProject: privateProcedure
     .input(createProjectValidationSchema)
     .mutation(async ({ ctx, input }) => {
-      const projects = await ctx.db.project.create({
-        data: {
-          name: input.name,
-          githubUrl: input?.githubUrl ?? "",
-          userToProjects: {
-            create: {
-              userId: ctx.user.userId!,
-            },
-          },
-        },
-      });
+      const project = await createProject(ctx.user.userId!, input);
 
       //* Auto Index Github Repo
       await indexGithubRepo(
-        projects?.id,
+        project?.id,
         input?.githubUrl ?? "",
         input?.githubToken,
       );
 
       //* Auto Poll Commits
-      await pollCommits(projects?.id);
-      return projects;
+      await pollCommits(project?.id);
+      return project;
     }),
-  getProjects: privateProcedure.query(async ({ ctx }) => {
-    return await ctx.db.project.findMany({
-      where: {
-        userToProjects: {
-          some: {
-            userId: ctx.user.userId!,
-          },
-        },
-        deletedAt: null, // Only return projects that are not deleted
-      },
-    });
-  }),
+  getProjects: privateProcedure.query(
+    async ({ ctx }) => await getProjectsByUserId(ctx.user.userId!),
+  ),
   getCommits: privateProcedure
     .input(
       z.object({
         projectId: z.string(),
       }),
     )
-    .query(async ({ ctx, input }) => {
+    .query(async ({ input }) => {
       //* Auto Poll Commits for newer commits
-      await pollCommits(input?.projectId).then().catch(console.error);
+      await pollCommits(input?.projectId)
+        .then(() => {
+          console.log("Commits polled successfully");
+        })
+        .catch(console.error);
 
-      return await ctx.db.commit.findMany({
-        where: {
-          projectId: input?.projectId,
-        },
-      });
+      return await getCommitsByProjectId(input?.projectId);
     }),
+  saveAnswer: privateProcedure
+    .input(createQuestionValidationSchema)
+    .mutation(
+      async ({ ctx, input }) => await saveAnswer(ctx.user.userId!, input),
+    ),
 });

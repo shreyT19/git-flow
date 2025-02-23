@@ -17,3 +17,5 @@ export const createProjectValidationSchema = z
     message: "Provide either GitHub URL or GitHub Token, not both 🫣",
     path: ["githubUrl"],
   });
+
+export type IProjectBase = z.infer<typeof createProjectValidationSchema>;
