@@ -40,6 +40,7 @@ model Project{
     commits  Commit[]
     sourceCodeEmbeddings SourceCodeEmbedding[]
     savedQuestions Question[]
+    meetings Meeting[]
 }
 
 model UserToProject{
@@ -105,4 +106,40 @@ model Question{
 
     userId String
     user User @relation(fields:[userId],references:[id])
+}
+
+enum MeetingStatus{
+    PROCESSING
+    COMPLETED
+}
+
+model Meeting{
+    id String @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    meetingUrl String // AppWrite storage url
+    projectId String
+    project Project @relation(fields:[projectId],references:[id])
+
+    status MeetingStatus @default(PROCESSING)
+
+    meetingTranscripts MeetingTranscript[]
+}
+
+model MeetingTranscript{ // Issues
+    id String @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    start DateTime
+    end DateTime
+
+    transcript String // Gist of the meeting
+    headline String
+    summary String
+
+    meetingId String
+    meeting Meeting @relation(fields:[meetingId],references:[id])
+    
 }
