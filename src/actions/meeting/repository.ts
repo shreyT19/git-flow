@@ -33,5 +33,8 @@ export const getMeetingById = async (id: string) => {
  * @returns The meetings
  */
 export const getMeetingsByProjectId = async (projectId: string) => {
-  return await db.meeting.findMany({ where: { projectId } });
+  return await db.meeting.findMany({
+    where: { projectId },
+    include: { meetingTranscripts: true },
+  });
 };

@@ -32,7 +32,7 @@ const QnaPage = () => {
         </div>
       </div>
 
-      <div className="flex flex-col gap-3">
+      <div className="mt-4 flex flex-col gap-3">
         {questions?.map((question, index) => (
           <div
             key={index}
