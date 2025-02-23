@@ -7,34 +7,57 @@ import React, { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import { toast } from "sonner";
+import { api } from "@/trpc/react";
+import useProject from "@/services/project";
+import { useRouter } from "next/navigation";
 
 const MeetingCard = () => {
+  const navigate = useRouter();
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
-  const { getRootProps, getInputProps, open } = useDropzone({
+  const { selectedProjectId } = useProject();
+  const { mutate: createMeeting } = api.project.createMeeting.useMutation();
+
+  const { getRootProps, getInputProps } = useDropzone({
     accept: {
       "audio/*": [".mp3", ".m4a", ".wav"],
     },
     multiple: false,
     maxSize: 50 * 1024 * 1024,
-    onDrop: async (acceptedFiles) => {
-      setIsUploading(true);
-      try {
-        const file = acceptedFiles[0];
-        const downloadUrl = await uploadFileToAppWrite(
-          file as File,
-          setProgress,
-        );
-        toast.success("Meeting uploaded successfully 🎉");
-        console.log(downloadUrl);
-      } catch (error) {
-        toast.error(`Error uploading meeting 🙁: ${error}`);
-        console.error("Error uploading meeting 🙁: ", error);
-      } finally {
-        setIsUploading(false);
-      }
-    },
+    onDrop: async (files) => await handleUploadMeeting(files[0] as File),
   });
+
+  const handleUploadMeeting = async (file: File) => {
+    if (!selectedProjectId) return;
+    if (!file) {
+      toast.error("Oops! There was an error with your file 🤖");
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const downloadUrl = await uploadFileToAppWrite(file as File, setProgress);
+      createMeeting(
+        {
+          meetingUrl: downloadUrl ?? "",
+          name: file.name,
+          projectId: selectedProjectId,
+        },
+        {
+          onSuccess: () => {
+            toast.success("Meeting uploaded successfully 🎉");
+            navigate.push(`/meetings`);
+          },
+          onError: (error) =>
+            toast.error(`Error uploading meeting 🙁: ${error}`),
+        },
+      );
+    } catch (error) {
+      console.error("Error uploading meeting 🙁: ", error);
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   return (
     <Card
