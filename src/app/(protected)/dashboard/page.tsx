@@ -3,6 +3,7 @@ import React from "react";
 import CommitLog from "./_layout/commit-log";
 import HeaderActions from "./_layout/header-actions";
 import QuestionCard from "./_layout/question-card";
+import MeetingCard from "./_layout/meeting-card";
 
 const Dashboard = () => {
   return (
@@ -11,6 +12,7 @@ const Dashboard = () => {
         <HeaderActions />
         <div className="grid grid-cols-5 gap-6">
           <QuestionCard />
+          <MeetingCard />
         </div>
         <CommitLog />
       </div>

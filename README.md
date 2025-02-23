@@ -37,6 +37,7 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
 - [ ] Show something different on the dashboard page
 - [ ] Make app feel smoother/Add attention to detail
 - [ ] Replace the ai chat modal with a sidepanel, also add validations before submitting the form
+- [ ] Improve the progress bar loading animation in meetings card
 
 ## Config Settings
 
