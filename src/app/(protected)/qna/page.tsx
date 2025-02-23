@@ -6,7 +6,7 @@ import useProject from "@/services/project";
 import { api } from "@/trpc/react";
 import { IQuestionResponse } from "@/types/question.types";
 import ToolTip from "@/components/ui/tooltip";
-import { ISourceCodeEmbeddingBase } from "@/types/sourceCodeEmbedding.types";
+import { ISourceCodeEmbedding } from "@/types/sourceCodeEmbedding.types";
 
 const QnaPage = () => {
   const [open, setOpen] = useState<boolean>(false);
@@ -73,7 +73,7 @@ const QnaPage = () => {
           setSelectedQuestion(null);
         }}
         fileReferences={
-          selectedQuestion?.fileReferences as ISourceCodeEmbeddingBase[]
+          selectedQuestion?.fileReferences as ISourceCodeEmbedding[]
         }
         answer={selectedQuestion?.answer ?? ""}
       />

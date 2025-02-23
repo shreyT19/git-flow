@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/server/db";
-import { IMeetingBase } from "@/utils/meeting.utils";
+import { IMeeting } from "@/utils/meeting.utils";
 import { EMeetingStatus } from "@prisma/client";
 
 /**
@@ -9,7 +9,7 @@ import { EMeetingStatus } from "@prisma/client";
  * @param data - The meeting data
  * @returns The created meeting
  */
-export const uploadMeeting = async (data: IMeetingBase) => {
+export const uploadMeeting = async (data: IMeeting) => {
   return await db.meeting.create({
     data: {
       ...data,

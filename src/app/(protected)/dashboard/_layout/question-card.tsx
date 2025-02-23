@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import useProject from "@/services/project";
-import type { ISourceCodeEmbeddingBase } from "@/types/sourceCodeEmbedding.types";
+import type { ISourceCodeEmbedding } from "@/types/sourceCodeEmbedding.types";
 import { askQuestion } from "@/libs/streamingSDK.libs";
 import { readStreamableValue } from "ai/rsc";
 import React, { useState } from "react";
@@ -19,7 +19,7 @@ const QuestionCard = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [fileReferences, setFileReferences] =
-    useState<ISourceCodeEmbeddingBase[]>();
+    useState<ISourceCodeEmbedding[]>();
 
   const [answer, setAnswer] = useState<string>("");
 

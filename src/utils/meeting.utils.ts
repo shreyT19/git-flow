@@ -8,4 +8,4 @@ export const createMeetingValidationSchema = z.object({
   status: z.nativeEnum(EMeetingStatus).optional(),
 });
 
-export type IMeetingBase = z.infer<typeof createMeetingValidationSchema>;
+export type IMeeting = z.infer<typeof createMeetingValidationSchema>;

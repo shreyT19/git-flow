@@ -9,13 +9,13 @@ import { SaveIcon, Workflow } from "lucide-react";
 import React from "react";
 import CodeReferences from "./code-references";
 import MDEditor from "@uiw/react-md-editor";
-import { ISourceCodeEmbeddingBase } from "@/types/sourceCodeEmbedding.types";
+import { ISourceCodeEmbedding } from "@/types/sourceCodeEmbedding.types";
 
 type Props = {
   open: boolean;
   onOpenChange: () => void;
   answer: string;
-  fileReferences: ISourceCodeEmbeddingBase[];
+  fileReferences: ISourceCodeEmbedding[];
   sheetHeader?: React.ReactNode;
 };
 

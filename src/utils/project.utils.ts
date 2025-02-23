@@ -18,7 +18,7 @@ export const createProjectValidationSchema = z
     path: ["githubUrl"],
   });
 
-export type IProjectBase = z.infer<typeof createProjectValidationSchema>;
+export type IProject = z.infer<typeof createProjectValidationSchema>;
 
 export const getProjectIdSchema = z.object({
   projectId: z.string(),

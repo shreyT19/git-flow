@@ -3,7 +3,7 @@
 import { db } from "@/server/db";
 import type {
   ICreateSourceCodeEmbedding,
-  ISourceCodeEmbeddingBase,
+  ISourceCodeEmbedding,
 } from "@/types/sourceCodeEmbedding.types";
 
 /**
@@ -35,9 +35,9 @@ export const addSourceCodeEmbedding = async (
 export const getSimilarSourceCodeEmbeddingsFromVector = async (
   vector: string,
   projectId: string,
-): Promise<ISourceCodeEmbeddingBase[]> => {
+): Promise<ISourceCodeEmbedding[]> => {
   // similarity - is a measure of similarity between two non-zero vectors of an inner product space
-  return await db.$queryRaw<ISourceCodeEmbeddingBase[]>`
+  return await db.$queryRaw<ISourceCodeEmbedding[]>`
   SELECT "fileName", "sourceCode", "summary",
   1 - ("summaryEmbedding" <=> ${vector}::vector) AS similarity 
   FROM "SourceCodeEmbedding"

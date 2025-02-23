@@ -1,12 +1,12 @@
 "use client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ISourceCodeEmbeddingBase } from "@/types/sourceCodeEmbedding.types";
+import { ISourceCodeEmbedding } from "@/types/sourceCodeEmbedding.types";
 import React, { useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 type Props = {
-  fileReferences: ISourceCodeEmbeddingBase[] | undefined;
+  fileReferences: ISourceCodeEmbedding[] | undefined;
 };
 
 const CodeReferences = ({ fileReferences }: Props) => {

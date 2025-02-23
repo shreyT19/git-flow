@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/server/db";
-import { IProjectBase } from "@/utils/project.utils";
+import { IProject } from "@/utils/project.utils";
 
 /**
  *  Get a project details by id
@@ -22,7 +22,7 @@ export const getProjectById = async (projectId: string) => {
  * @param project - The project to create
  * @returns The created project
  */
-export const createProject = async (userId: string, project: IProjectBase) => {
+export const createProject = async (userId: string, project: IProject) => {
   return await db.project.create({
     data: {
       name: project?.name,
