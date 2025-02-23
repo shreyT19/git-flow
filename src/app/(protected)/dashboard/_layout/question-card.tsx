@@ -13,6 +13,8 @@ import type { ISourceCodeEmbeddingBase } from "@/types/sourceCodeEmbedding.types
 import { askQuestion } from "@/utils/streaming.utils";
 import { readStreamableValue } from "ai/rsc";
 import React, { useState } from "react";
+import MDEditor from "@uiw/react-md-editor";
+import CodeReferences from "./code-references";
 
 const QuestionCard = () => {
   const { selectedProjectDetails } = useProject();
@@ -29,9 +31,9 @@ const QuestionCard = () => {
     e.preventDefault();
     if (!projectId) return;
     setLoading(true);
-    setOpen(true);
 
     const { stream, fileReferences } = await askQuestion(question, projectId);
+    setOpen(true);
     setFileReferences(fileReferences);
 
     for await (const chunk of readStreamableValue(stream)) {
@@ -45,21 +47,23 @@ const QuestionCard = () => {
 
   return (
     <>
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-h-[80vh] overflow-y-auto">
+      <Dialog
+        open={open}
+        onOpenChange={() => {
+          setOpen(false);
+          setAnswer("");
+          setFileReferences([]);
+          setQuestion("");
+        }}
+      >
+        <DialogContent className="max-h-[80dvh] overflow-y-auto sm:max-w-[80dvw]">
           <DialogHeader>
             <DialogTitle>GitFlow</DialogTitle>
           </DialogHeader>
-          {answer}
-          <h1>File References</h1>
-          {fileReferences?.map((fileReference) => {
-            return (
-              <div key={fileReference.fileName}>
-                <h1>{fileReference.fileName}</h1>
-                <pre>{fileReference.sourceCode}</pre>
-              </div>
-            );
-          })}
+          <div data-color-mode="light" className="flex flex-col gap-4">
+            <MDEditor.Markdown source={answer} />
+            <CodeReferences fileReferences={fileReferences} />
+          </div>
         </DialogContent>
       </Dialog>
 
@@ -74,7 +78,7 @@ const QuestionCard = () => {
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
             />
-            <Button className="w-fit" type="submit">
+            <Button className="w-fit" type="submit" disabled={loading}>
               Ask AI!
             </Button>
           </form>
