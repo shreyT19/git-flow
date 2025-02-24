@@ -81,13 +81,13 @@ const MeetingsPage = () => {
               <Link href={`/meetings/${meeting.id}`} target="_blank">
                 <Button variant="outline">View Meeting</Button>
               </Link>
-              <Button
+              {/* <Button
                 variant="destructive"
                 disabled={isPending}
                 onClick={() => deleteMeeting({ meetingId: meeting.id })}
               >
                 Delete Meeting
-              </Button>
+              </Button> */}
             </div>
           </li>
         ))}
