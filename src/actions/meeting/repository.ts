@@ -25,7 +25,10 @@ export const uploadMeeting = async (data: IMeeting) => {
  * @returns The meeting
  */
 export const getMeetingById = async (id: string) => {
-  return await db.meeting.findUnique({ where: { id } });
+  return await db.meeting.findUnique({
+    where: { id },
+    include: { meetingTranscripts: true },
+  });
 };
 
 /**
@@ -84,3 +87,6 @@ export const createBulkMeetingTranscripts = async (
 
 export const deleteMeeting = async (id: string) =>
   await db.meeting.delete({ where: { id } });
+
+export const getMeetingTranscriptsByMeetingId = async (meetingId: string) =>
+  await db.meetingTranscript.findMany({ where: { meetingId } });
