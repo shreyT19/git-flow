@@ -15,8 +15,12 @@ import {
   createProjectValidationSchema,
 } from "@/utils/project.utils";
 import { createQuestionValidationSchema } from "@/utils/question.utils";
-import { createMeetingValidationSchema } from "@/utils/meeting.utils";
 import {
+  createMeetingValidationSchema,
+  getMeetingIdSchema,
+} from "@/utils/meeting.utils";
+import {
+  deleteMeeting,
   getMeetingsByProjectId,
   uploadMeeting,
 } from "@/actions/meeting/repository";
@@ -73,4 +77,7 @@ export const projectRouter = createTRPCRouter({
     .query(async ({ input }) => {
       return await getMeetingsByProjectId(input?.projectId);
     }),
+  deleteMeeting: privateProcedure
+    .input(getMeetingIdSchema)
+    .mutation(async ({ input }) => await deleteMeeting(input?.meetingId)),
 });

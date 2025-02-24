@@ -133,8 +133,8 @@ model MeetingTranscript{ // Issues
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    start DateTime
-    end DateTime
+    start String
+    end String
 
     transcript String // Gist of the meeting
     headline String

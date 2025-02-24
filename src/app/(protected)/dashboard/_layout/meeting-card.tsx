@@ -10,6 +10,9 @@ import { toast } from "sonner";
 import { api } from "@/trpc/react";
 import useProject from "@/services/project";
 import { useRouter } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
+import { IProcessMeeting } from "@/utils/meeting.utils";
 
 const MeetingCard = () => {
   const navigate = useRouter();
@@ -17,6 +20,18 @@ const MeetingCard = () => {
   const [progress, setProgress] = useState(0);
   const { selectedProjectId } = useProject();
   const { mutate: createMeeting } = api.project.createMeeting.useMutation();
+  const processMeeting = useMutation({
+    mutationFn: async (data: IProcessMeeting) => {
+      const { meetingUrl, meetingId } = data;
+      const res = await axios.post(
+        "/api/process-meeting",
+        { meetingUrl, meetingId },
+        { timeout: 60 * 5 * 1000 }, // 5 minutes
+      );
+
+      return res.data;
+    },
+  });
 
   const { getRootProps, getInputProps } = useDropzone({
     accept: {
@@ -44,9 +59,13 @@ const MeetingCard = () => {
           projectId: selectedProjectId,
         },
         {
-          onSuccess: () => {
+          onSuccess: (meeting) => {
             toast.success("Meeting uploaded successfully 🎉");
             navigate.push(`/meetings`);
+            processMeeting.mutate({
+              meetingUrl: downloadUrl ?? "",
+              meetingId: meeting.id,
+            });
           },
           onError: (error) =>
             toast.error(`Error uploading meeting 🙁: ${error}`),

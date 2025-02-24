@@ -1,6 +1,7 @@
 "use server";
 
 import { db } from "@/server/db";
+import type { IMeetingSummary } from "@/types/meeting.types";
 import { IMeeting } from "@/utils/meeting.utils";
 import { EMeetingStatus } from "@prisma/client";
 
@@ -35,6 +36,51 @@ export const getMeetingById = async (id: string) => {
 export const getMeetingsByProjectId = async (projectId: string) => {
   return await db.meeting.findMany({
     where: { projectId },
-    include: { meetingTranscripts: true },
+    include: {
+      meetingTranscripts: {
+        select: {
+          id: true,
+          headline: true,
+          summary: true,
+          meetingId: true,
+          createdAt: true,
+          updatedAt: true,
+          start: true,
+          end: true,
+          transcript: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
   });
 };
+
+/**
+ * Create bulk meeting transcripts
+ * @param meetingId - The id of the meeting
+ * @param data - The meeting transcripts
+ * @returns The created meeting transcripts
+ */
+export const createBulkMeetingTranscripts = async (
+  meetingId: string,
+  data: IMeetingSummary[],
+) => {
+  //* Create meeting transcripts
+  const res = await db.meetingTranscript.createMany({
+    data: data.map((summary) => ({
+      ...summary,
+      meetingId,
+    })),
+  });
+
+  //* Update meeting status to COMPLETED
+  return await db.meeting.update({
+    where: { id: meetingId },
+    data: { status: EMeetingStatus.COMPLETED, name: data?.[0]?.headline },
+  });
+};
+
+export const deleteMeeting = async (id: string) =>
+  await db.meeting.delete({ where: { id } });

@@ -15,21 +15,14 @@ const MeetingsPage = () => {
 
   const { data: meetings, isLoading } = api.project.getMeetings.useQuery(
     { projectId },
-    {
-      refetchInterval: 3000, //* Refetch every 3 seconds to check if the meeting has been processed or not
-    },
+    { refetchInterval: 4000 }, //* Refetch every 4 seconds to check if the meeting has been processed or not
   );
 
-  if (meetings?.length === 0) {
-    return (
-      <div className="mt-3 flex h-full w-full items-center justify-center">
-        <p className="text-sm text-muted-foreground">No meetings found</p>
-      </div>
-    );
-  }
+  const { mutate: deleteMeeting, isPending } =
+    api.project.deleteMeeting.useMutation();
 
   return (
-    <div className="mt-3 flex flex-col gap-3">
+    <div className="mt-3 flex h-full flex-col gap-3">
       <MeetingCard />
       <div className="flex flex-col gap-4">
         <h1 className="text-lg font-semibold text-primary">Meetings</h1>
@@ -37,6 +30,14 @@ const MeetingsPage = () => {
       <ConditionalWrapper show={isLoading}>
         <div className="mt-3 flex h-full w-full items-center justify-center">
           <Loader2 className="size-10 animate-spin" />
+        </div>
+      </ConditionalWrapper>
+      <ConditionalWrapper
+        className="mt-3 flex h-full w-full items-center justify-center"
+        show={meetings?.length === 0}
+      >
+        <div className="mt-3 flex h-full w-full items-center justify-center">
+          <p className="text-sm text-muted-foreground">No meetings found</p>
         </div>
       </ConditionalWrapper>
       <ConditionalWrapper
@@ -80,6 +81,13 @@ const MeetingsPage = () => {
               <Link href={`/meetings/${meeting.id}`} target="_blank">
                 <Button variant="outline">View Meeting</Button>
               </Link>
+              <Button
+                variant="destructive"
+                disabled={isPending}
+                onClick={() => deleteMeeting({ meetingId: meeting.id })}
+              >
+                Delete Meeting
+              </Button>
             </div>
           </li>
         ))}
