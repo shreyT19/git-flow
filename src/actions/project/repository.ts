@@ -50,12 +50,67 @@ export const getProjectsByUserId = async (userId: string) => {
         },
       },
       deletedAt: null,
+      isArchived: false,
     },
     include: {
       userToProjects: {
         include: {
           user: true,
         },
+      },
+    },
+  });
+};
+
+/**
+ * Archive a project
+ * @param projectId - The project's ID
+ * @returns The archived project
+ */
+export const archiveProject = async (projectId: string) => {
+  return await db.project.update({
+    where: {
+      id: projectId,
+    },
+    data: {
+      isArchived: true,
+      deletedAt: new Date(),
+    },
+  });
+};
+
+/**
+ * Unarchive a project
+ * @param projectId - The project's ID
+ * @returns The unarchived project
+ */
+export const unarchiveProject = async (projectId: string) => {
+  return await db.project.update({
+    where: {
+      id: projectId,
+    },
+    data: {
+      isArchived: false,
+      deletedAt: null,
+    },
+  });
+};
+
+/**
+ * Get list of archived projects
+ * @param userId - The user's ID
+ * @returns The archived projects
+ */
+export const getArchivedProjectsByUserId = async (userId: string) => {
+  return await db.project.findMany({
+    where: {
+      userToProjects: {
+        some: {
+          userId: userId,
+        },
+      },
+      deletedAt: {
+        not: null,
       },
     },
   });

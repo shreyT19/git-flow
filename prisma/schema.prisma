@@ -41,6 +41,7 @@ model Project{
     sourceCodeEmbeddings SourceCodeEmbedding[]
     savedQuestions Question[]
     meetings Meeting[]
+    isArchived Boolean @default(false)
 }
 
 model UserToProject{
