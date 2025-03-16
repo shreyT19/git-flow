@@ -5,6 +5,7 @@ import { TRPCReactProvider } from "@/trpc/react";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "sonner";
 import { ModalProvider } from "@/providers/ModalProvider";
+import Transition from "@/providers/TransitionProvider";
 
 export const metadata: Metadata = {
   title: "Git Flow",
@@ -26,7 +27,9 @@ export default function RootLayout({
               position="top-right"
               duration={3500}
             />
-            <TRPCReactProvider>{children}</TRPCReactProvider>
+            <Transition>
+              <TRPCReactProvider>{children}</TRPCReactProvider>
+            </Transition>
           </ModalProvider>
         </body>
       </html>
