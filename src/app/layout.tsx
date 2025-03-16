@@ -4,6 +4,7 @@ import { type Metadata } from "next";
 import { TRPCReactProvider } from "@/trpc/react";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "sonner";
+import { ModalProvider } from "@/providers/ModalProvider";
 
 export const metadata: Metadata = {
   title: "Git Flow",
@@ -18,13 +19,15 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en" className={`${GeistSans.variable}`}>
         <body>
-          <Toaster
-            richColors
-            closeButton
-            position="top-right"
-            duration={3500}
-          />
-          <TRPCReactProvider>{children}</TRPCReactProvider>
+          <ModalProvider>
+            <Toaster
+              richColors
+              closeButton
+              position="top-right"
+              duration={3500}
+            />
+            <TRPCReactProvider>{children}</TRPCReactProvider>
+          </ModalProvider>
         </body>
       </html>
     </ClerkProvider>

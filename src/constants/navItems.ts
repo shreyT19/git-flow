@@ -1,10 +1,21 @@
-import { Bot, CreditCard, LayoutDashboard, Presentation } from "lucide-react";
+import {
+  Bot,
+  CreditCard,
+  Folders,
+  LayoutDashboard,
+  Presentation,
+} from "lucide-react";
 
 const NAV_ITEMS = [
   {
     title: "Dashboard",
     url: "/dashboard",
     icon: LayoutDashboard,
+  },
+  {
+    title: "Projects",
+    url: "/projects",
+    icon: Folders,
   },
   {
     title: "Q&A",

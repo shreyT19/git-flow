@@ -13,11 +13,12 @@ import { Button, ButtonProps } from "@/components/ui/button";
 export type IModalProps = {
   modalOpen: boolean;
   setModalOpen: (open: boolean) => void;
-  description: string;
+  description?: string;
   title: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   confirmButtonProps?: ButtonProps;
   cancelButtonProps?: ButtonProps;
+  closeOnClickOutside?: boolean;
 };
 
 const Modal = ({
@@ -28,10 +29,15 @@ const Modal = ({
   children,
   confirmButtonProps,
   cancelButtonProps,
+  closeOnClickOutside = true,
 }: IModalProps) => {
   return (
-    <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-      <DialogContent>
+    <Dialog open={modalOpen} onOpenChange={setModalOpen} modal={true}>
+      <DialogContent
+        onPointerDownOutside={(e) => {
+          if (!closeOnClickOutside) e.preventDefault();
+        }}
+      >
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
@@ -52,7 +58,7 @@ const Modal = ({
           </Button>
           <Button
             {...confirmButtonProps}
-            variant="outline"
+            variant="destructive"
             onClick={(e) => confirmButtonProps?.onClick?.(e)}
           >
             Confirm

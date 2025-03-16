@@ -1,5 +1,6 @@
-import Modal, { IModalProps } from "@/components/global/Modals/Modal";
-import React, { createContext, useContext, useState, ReactNode } from "react";
+"use client";
+import Modal, { IModalProps } from "@/components/global/Modals";
+import React, { useContext, useState, ReactNode, createContext } from "react";
 
 /**
  * useModal provides an easy way to trigger modals that require user confirmation.
@@ -36,7 +37,10 @@ import React, { createContext, useContext, useState, ReactNode } from "react";
  * ---------------------------------------------------------------------------------------------------------
  */
 
-export type IConfirmModalProps = Omit<IModalProps, "show" | "onClose">;
+export type IConfirmModalProps = Omit<
+  IModalProps,
+  "modalOpen" | "setModalOpen"
+>;
 
 interface ModalContextType {
   confirm: (modalProps: IConfirmModalProps) => void;
@@ -50,9 +54,9 @@ const ModalContext = createContext<ModalContextType | undefined>(undefined);
 export const ModalProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [modalProps, setModalProps] = useState<IModalProps | null>(null);
+  const [modalProps, setModalProps] = useState<IConfirmModalProps | null>(null);
 
-  const confirm = (props: IModalProps) => {
+  const confirm = (props: IConfirmModalProps) => {
     setModalProps(props);
   };
 
@@ -66,6 +70,7 @@ export const ModalProvider: React.FC<{ children: ReactNode }> = ({
       {modalProps && (
         <Modal
           {...modalProps}
+          closeOnClickOutside={modalProps?.closeOnClickOutside ?? false}
           modalOpen={!!modalProps}
           setModalOpen={close}
           cancelButtonProps={{

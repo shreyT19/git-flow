@@ -1,7 +1,10 @@
 import { getCommitsByProjectId } from "@/actions/commit/repository";
 import {
+  archiveProject,
   createProject,
+  getArchivedProjectsByUserId,
   getProjectsByUserId,
+  unarchiveProject,
 } from "@/actions/project/repository";
 import {
   saveAnswer,
@@ -84,10 +87,20 @@ export const projectRouter = createTRPCRouter({
     .query(async ({ input }) => await getMeetingById(input?.meetingId)),
   getMeetingTranscripts: privateProcedure
     .input(getMeetingIdSchema)
-    .query(async ({ input }) =>
-      await getMeetingTranscriptsByMeetingId(input?.meetingId),
+    .query(
+      async ({ input }) =>
+        await getMeetingTranscriptsByMeetingId(input?.meetingId),
     ),
   deleteMeeting: privateProcedure
     .input(getMeetingIdSchema)
     .mutation(async ({ input }) => await deleteMeeting(input?.meetingId)),
+  archiveProject: privateProcedure
+    .input(getProjectIdSchema)
+    .mutation(async ({ input }) => await archiveProject(input?.projectId)),
+  unarchiveProject: privateProcedure
+    .input(getProjectIdSchema)
+    .mutation(async ({ input }) => await unarchiveProject(input?.projectId)),
+  getArchivedProjects: privateProcedure.query(
+    async ({ ctx }) => await getArchivedProjectsByUserId(ctx.user.userId!),
+  ),
 });
