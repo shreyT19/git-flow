@@ -25,6 +25,7 @@ import {
   Search,
   VideoIcon,
   Loader2,
+  EyeOff,
 } from "lucide-react";
 
 export const iconMap = {
@@ -53,6 +54,7 @@ export const iconMap = {
   search: <Search />,
   video: <VideoIcon />,
   loader2: <Loader2 />,
+  eyeOff: <EyeOff />,
 } as const;
 
 export type IconType = keyof typeof iconMap;

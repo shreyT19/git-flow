@@ -5,6 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/utils/tailwind.utils";
 import { getIconForKeyword, IconType } from "@/utils/icons.utils";
 import { useState } from "react";
+import ToolTip, { IToolTipProps } from "@/components/ui/tooltip";
 
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
@@ -40,6 +41,7 @@ const buttonVariants = cva(
       },
       size: {
         default: "h-10 px-4 py-2",
+        xs: "h-8 rounded-md px-2 text-xs",
         sm: "h-9 rounded-md px-3",
         lg: "h-11 rounded-md px-8",
         icon: "h-10 w-10",
@@ -51,6 +53,9 @@ const buttonVariants = cva(
     },
   },
 );
+
+export type ButtonVariants = VariantProps<typeof buttonVariants>;
+export type IButtonVariants = NonNullable<ButtonVariants["variant"]>;
 
 interface IconProps {
   icon: IconType;
@@ -69,11 +74,13 @@ export interface ButtonProps
   loading?: boolean;
   loadingPosition?: "left" | "right";
   onClick?: React.MouseEventHandler<HTMLButtonElement> | (() => Promise<void>);
+  tooltipTitle?: string;
+  tooltipProps?: Omit<IToolTipProps, "title" | "children">;
 }
 
 export type ButtonIconProps = IconProps | IconRefProps;
 
-const Button = React.forwardRef<
+const ButtonComponent = React.forwardRef<
   HTMLButtonElement,
   ButtonProps & ButtonIconProps
 >(
@@ -153,6 +160,26 @@ const Button = React.forwardRef<
     );
   },
 );
+ButtonComponent.displayName = "ButtonComponent";
+
+// Button wrapper with tooltip support
+const Button = React.forwardRef<
+  HTMLButtonElement,
+  ButtonProps & ButtonIconProps
+>((props, ref) => {
+  const { tooltipTitle, tooltipProps, ...buttonProps } = props;
+
+  if (tooltipTitle) {
+    return (
+      <ToolTip title={tooltipTitle} {...tooltipProps}>
+        <ButtonComponent ref={ref} {...buttonProps} />
+      </ToolTip>
+    );
+  }
+
+  return <ButtonComponent ref={ref} {...buttonProps} />;
+});
+
 Button.displayName = "Button";
 
 export { Button, buttonVariants };
