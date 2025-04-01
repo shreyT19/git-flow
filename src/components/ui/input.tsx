@@ -2,6 +2,7 @@ import * as React from "react";
 import { cn } from "@/utils/tailwind.utils";
 import ConditionalWrapper from "../global/ConditionalWrapper";
 import { InfoIcon } from "lucide-react";
+import { FadeInDiv } from "../global/MotionTag";
 
 interface InputProps
   extends React.ComponentProps<"input">,
@@ -34,15 +35,15 @@ const Input = React.forwardRef(
           {...props}
         />
         <ConditionalWrapper show={Boolean(description)}>
-          <div
+          <FadeInDiv
             className={cn(
-              "text-s flex items-center gap-1 text-muted-foreground",
+              "flex items-center gap-1 text-s text-muted-foreground",
               descriptionClassName,
             )}
           >
             <InfoIcon className="h-3 w-3" />
             <p>{description}</p>
-          </div>
+          </FadeInDiv>
         </ConditionalWrapper>
       </div>
     );
