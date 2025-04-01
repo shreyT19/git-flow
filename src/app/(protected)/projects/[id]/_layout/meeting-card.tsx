@@ -8,17 +8,23 @@ import { useDropzone } from "react-dropzone";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import { toast } from "sonner";
 import { api } from "@/trpc/react";
-import useProject from "@/services/project";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { IProcessMeeting } from "@/utils/meeting.utils";
+import { Skeleton } from "@/components/ui/skeleton";
+import { IProjectResponse } from "@/types/project.types";
 
-const MeetingCard = () => {
+const MeetingCard = ({
+  isLoading,
+  project,
+}: {
+  isLoading: boolean;
+  project: IProjectResponse;
+}) => {
   const navigate = useRouter();
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
-  const { selectedProjectId } = useProject();
   const { mutate: createMeeting } = api.project.createMeeting.useMutation();
   const processMeeting = useMutation({
     mutationFn: async (data: IProcessMeeting) => {
@@ -43,7 +49,7 @@ const MeetingCard = () => {
   });
 
   const handleUploadMeeting = async (file: File) => {
-    if (!selectedProjectId) return;
+    if (!project.id) return;
     if (!file) {
       toast.error("Oops! There was an error with your file 🤖");
       return;
@@ -56,7 +62,7 @@ const MeetingCard = () => {
         {
           meetingUrl: downloadUrl ?? "",
           name: file.name,
-          projectId: selectedProjectId,
+          projectId: project.id,
         },
         {
           onSuccess: (meeting) => {
@@ -77,6 +83,10 @@ const MeetingCard = () => {
       setIsUploading(false);
     }
   };
+
+  if (isLoading) {
+    return <MeetingCardSkeleton />;
+  }
 
   return (
     <Card
@@ -123,6 +133,17 @@ const MeetingCard = () => {
           </div>
         </div>
       </ConditionalWrapper>
+    </Card>
+  );
+};
+
+const MeetingCardSkeleton = () => {
+  return (
+    <Card className="col-span-2 flex flex-col items-center justify-center gap-4 py-10">
+      <Skeleton className="h-10 w-10 rounded-full" />
+      <Skeleton className="h-5 w-40" />
+      <Skeleton className="h-10 w-32 text-center" />
+      <Skeleton className="h-9 w-36" />
     </Card>
   );
 };

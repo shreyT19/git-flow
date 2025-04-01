@@ -2,7 +2,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import useProject from "@/services/project";
 import type { ISourceCodeEmbedding } from "@/types/sourceCodeEmbedding.types";
 import { askQuestion } from "@/libs/streamingSDK.libs";
 import { readStreamableValue } from "ai/rsc";
@@ -12,9 +11,34 @@ import { api } from "@/trpc/react";
 import { toast } from "sonner";
 import FileReferences from "./file-references";
 import useRefetch from "@/hooks/useRefetch";
+import { IProjectResponse } from "@/types/project.types";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const QuestionCard = () => {
-  const { selectedProjectDetails } = useProject();
+const QuestionCardSkeleton = () => {
+  return (
+    <>
+      <Card className="col-span-3">
+        <CardHeader>
+          <Skeleton className="h-6 w-40" />
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col gap-4">
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-10 w-24" />
+          </div>
+        </CardContent>
+      </Card>
+    </>
+  );
+};
+
+const QuestionCard = ({
+  project: selectedProjectDetails,
+  isLoading = false,
+}: {
+  project: IProjectResponse;
+  isLoading?: boolean;
+}) => {
   const [question, setQuestion] = useState<string>("");
   const [open, setOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -68,6 +92,10 @@ const QuestionCard = () => {
     );
   };
 
+  if (isLoading) {
+    return <QuestionCardSkeleton />;
+  }
+
   return (
     <>
       <Card className="col-span-3">
@@ -80,6 +108,7 @@ const QuestionCard = () => {
               placeholder="Which file should I change to edit the homepage?"
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
+              rows={5}
             />
             <Button className="w-fit" type="submit" disabled={loading}>
               Ask AI!

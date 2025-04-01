@@ -34,7 +34,7 @@ import {
   DataTableProps,
   EmptyStateProps,
   RowAction,
-} from "@/types/DataTable.types";
+} from "@/types/dataTable.types";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -227,7 +227,8 @@ const DataTable = <T extends object>({
 
   const isEmpty = table.getRowModel().rows.length === 0 && !isLoading;
   const hasInitialData = data.length > 0;
-  const shouldShowSearch = enableFiltering && setSearchQuery && (hasInitialData || searchQuery);
+  const shouldShowSearch =
+    enableFiltering && setSearchQuery && (hasInitialData || searchQuery);
 
   const EmptyState = ({
     searchText,
@@ -254,7 +255,7 @@ const DataTable = <T extends object>({
           {isFiltered ? searchText : defaultText}
         </h3>
         <p className="mt-2 max-w-md text-sm text-muted-foreground">
-          {isFiltered 
+          {isFiltered
             ? "Try adjusting your search or filters to find what you're looking for."
             : "Get started by creating your first entry or try a different view."}
         </p>

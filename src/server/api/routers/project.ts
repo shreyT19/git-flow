@@ -3,6 +3,7 @@ import {
   archiveProject,
   createProject,
   getArchivedProjectsByUserId,
+  getProjectById,
   getProjectsByUserId,
   unarchiveProject,
 } from "@/actions/project/repository";
@@ -50,6 +51,9 @@ export const projectRouter = createTRPCRouter({
   getProjects: privateProcedure.query(
     async ({ ctx }) => await getProjectsByUserId(ctx.user.userId!),
   ),
+  getProjectById: privateProcedure
+    .input(getProjectIdSchema)
+    .query(async ({ input }) => await getProjectById(input?.projectId)),
   getCommits: privateProcedure
     .input(getProjectIdSchema)
     .query(async ({ input }) => {

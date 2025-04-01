@@ -49,7 +49,7 @@ const AppSidebar = () => {
                     <Link
                       href={item.url}
                       className={cn({
-                        "!bg-primary !text-white": pathName === item.url,
+                        "!bg-primary !text-white": pathName.includes(item.url),
                       })}
                     >
                       <item.icon />

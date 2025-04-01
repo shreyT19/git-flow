@@ -1,16 +1,21 @@
-import { archiveProject } from "@/actions/project/repository";
 import { Button } from "@/components/ui/button";
 import { useModal } from "@/providers/ModalProvider";
-import useProject from "@/services/project";
 import { api } from "@/trpc/react";
+import { IProjectResponse } from "@/types/project.types";
 import { ExternalLink, Github } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const HeaderActions = () => {
+const HeaderActions = ({
+  project,
+  isLoading,
+}: {
+  project: IProjectResponse;
+  isLoading: boolean;
+}) => {
   const archiveProject = api.project.archiveProject.useMutation();
-  const { selectedProjectDetails: project } = useProject();
 
   const { confirm, close } = useModal();
 
@@ -51,6 +56,28 @@ const HeaderActions = () => {
       },
     });
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-wrap items-center justify-between">
+        {/* Github Link Skeleton */}
+        <div className="w-fit rounded-md bg-primary px-4 py-3">
+          <div className="flex items-center">
+            <Skeleton className="size-5 rounded-full bg-white/20" />
+            <div className="ml-2">
+              <Skeleton className="h-4 w-72 bg-white/20" />
+            </div>
+          </div>
+        </div>
+        {/* Actions Skeleton */}
+        <div className="flex items-center gap-4">
+          <Skeleton className="h-9 w-32 rounded-md bg-gray-200" />
+          <Skeleton className="h-9 w-32 rounded-md bg-gray-200" />
+          <Skeleton className="h-9 w-32 rounded-md bg-gray-200" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-wrap items-center justify-between">

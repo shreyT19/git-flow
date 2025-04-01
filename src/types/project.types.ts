@@ -1,11 +1,9 @@
 import type { IBaseResponseSchema } from "./types";
 
-export interface ICreateProject {
+export type ICreateProject = {
   name: string;
   githubUrl: string;
-  githubToken: string;
-}
+  githubToken?: string;
+};
 
-export interface IProjectResponse extends ICreateProject, IBaseResponseSchema {
-  deletedAt?: string;
-}
+export type IProjectResponse = ICreateProject & IBaseResponseSchema;
