@@ -7,6 +7,7 @@ import useProject from "@/services/project";
 import DataTable from "@/components/global/Datatable";
 import { SlideUpDiv } from "@/components/global/MotionTag";
 import { TitleDescriptionBox } from "@/components/global/Layouts/TitleDescriptionBox";
+import router from "next/router";
 
 const ProjectsPage = () => {
   const { projects } = useProject();
@@ -24,7 +25,7 @@ const ProjectsPage = () => {
         <TitleDescriptionBox
           title="Projects"
           titleAs="h1"
-          description="Manage your Git repositories and workflows"
+          description="Manage your projects (e.g. github repositories)"
         />
         <div>
           <Button
@@ -55,7 +56,6 @@ const ProjectsPage = () => {
             {
               header: "Repository",
               accessorKey: "githubUrl",
-              meta: { type: "link" },
             },
             {
               header: "Last Updated",
@@ -64,7 +64,10 @@ const ProjectsPage = () => {
             },
             {
               header: "Status",
-              meta: { type: "tag" },
+              meta: {
+                type: "tag",
+                metaData: { icon: "dot", variant: "success" },
+              },
               cell: () => "Active",
             },
           ]}
@@ -85,10 +88,13 @@ const ProjectsPage = () => {
             },
             defaultAction: {
               label: "New Project",
-              icon: <Plus className="mr-1 h-3 w-3" />,
+              icon: "plus",
               onClick: () => {},
             },
           }}
+          onRowClick={(row) => router.push(`/projects/${row?.id}`)}
+          onRefresh={() => setRerenderKey((prev) => prev + 1)}
+          // isLoading={true}
           rowActions={[
             {
               label: "View Details",
@@ -100,6 +106,7 @@ const ProjectsPage = () => {
             },
             {
               label: "Delete",
+              variant: "destructive",
               onClick: () => {},
             },
           ]}

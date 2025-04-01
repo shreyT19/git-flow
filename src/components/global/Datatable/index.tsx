@@ -11,14 +11,13 @@ import {
   VisibilityState,
   getPaginationRowModel,
   Cell,
+  Table as TableType,
 } from "@tanstack/react-table";
 import {
   Table,
-  TableBody,
   TableCell,
   TableHead,
   TableHeader,
-  TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,28 +25,32 @@ import {
   Search,
   Plus,
   MoreHorizontal,
-  RefreshCw,
   Calendar,
   Tag,
   Link as LinkIcon,
 } from "lucide-react";
-import { DataTableProps, EmptyStateProps, RowAction } from "./DataTable.types";
+import {
+  ColumnMeta,
+  DataTableProps,
+  EmptyStateProps,
+  RowAction,
+} from "./DataTable.types";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuCheckboxItem,
+  DropdownMenuItemProps,
 } from "@/components/ui/dropdown-menu";
-import { motion } from "motion/react";
 import { AnimatePresence } from "motion/react";
 import { SearchInput } from "./SearchInput";
-
-// Import or define the ColumnMeta type
-interface ColumnMeta {
-  type?: "date" | "tag" | "link";
-  // Add other meta properties as needed
-}
+import { Skeleton } from "@/components/ui/skeleton";
+import { MotionTableRow } from "../MotionTag";
+import { Badge } from "@/components/ui/badge";
+import { getIconForKeyword } from "@/utils/icons.utils";
+import ConditionalWrapper from "../ConditionalWrapper";
+import DropDownMenu from "../Dropdowns/DropDownMenu";
 
 const DataTable = <T extends object>({
   data,
@@ -104,37 +107,40 @@ const DataTable = <T extends object>({
         id: "actions",
         header: "",
         cell: ({ row }) => (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {rowActions
+          <DropDownMenu
+            actions={
+              rowActions
                 .filter(
                   (action) => !action.hidden || !action.hidden(row.original),
                 )
-                .map((action, index) => (
-                  <DropdownMenuItem
-                    key={index}
-                    onClick={() => action.onClick(row.original)}
-                    disabled={
-                      action.disabled ? action.disabled(row.original) : false
-                    }
-                    className={
-                      action.variant === "destructive"
-                        ? "text-red-600 focus:bg-red-50 focus:text-red-600"
-                        : ""
-                    }
-                  >
-                    {action.icon && <span className="mr-2">{action.icon}</span>}
-                    {action.label}
-                  </DropdownMenuItem>
-                ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+                .map((action) => ({
+                  onClick: () => action.onClick(row.original),
+                  disabled: action.disabled
+                    ? action.disabled(row.original)
+                    : false,
+
+                  children: (
+                    <div
+                      className={`flex items-center gap-2 text-xs ${
+                        action.variant === "destructive"
+                          ? "!text-red-600 focus:!bg-red-50 focus:!text-red-600"
+                          : ""
+                      }`}
+                    >
+                      {action.label}
+                    </div>
+                  ),
+                })) as DropdownMenuItemProps[]
+            }
+            dropdownTrigger={
+              <Button
+                variant="ghost"
+                icon="moreHorizontal"
+                className="h-8 w-8 p-0"
+                iconPlacement="left"
+              />
+            }
+          />
         ),
         enableSorting: false,
         enableResizing: false,
@@ -174,23 +180,18 @@ const DataTable = <T extends object>({
       case "tag":
         return (
           <div className="flex items-center">
-            <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
-              <Tag className="mr-1 h-3 w-3" />
+            <Badge
+              variant={meta?.metaData?.variant}
+              className="flex items-center"
+            >
+              <ConditionalWrapper show={!!meta?.metaData?.icon}>
+                {getIconForKeyword(meta?.metaData?.icon!)}
+              </ConditionalWrapper>
               {flexRender(columnDef.cell, cell.getContext())}
-            </span>
+            </Badge>
           </div>
         );
-      case "link":
-        return (
-          <div className="flex items-center text-primary hover:underline">
-            <LinkIcon className="mr-1 h-3 w-3" />
-            {value
-              ? (value as React.ReactNode)
-              : columnDef.cell
-                ? flexRender(columnDef.cell, cell.getContext())
-                : null}
-          </div>
-        );
+
       default:
         return flexRender(columnDef.cell, cell.getContext());
     }
@@ -291,13 +292,13 @@ const DataTable = <T extends object>({
           {onRefresh && (
             <Button
               variant="outline"
-              size="sm"
+              size="xs"
+              className="mr-1 !text-xs"
+              icon="refresh"
+              iconPlacement="left"
+              tooltipTitle="Refresh data"
               onClick={onRefresh}
-              className="h-9 px-3"
-            >
-              <RefreshCw className="mr-2 h-4 w-4" />
-              Refresh
-            </Button>
+            />
           )}
           {enableColumnVisibility && (
             <DropdownMenu>
@@ -308,11 +309,7 @@ const DataTable = <T extends object>({
                   className="mr-1 !text-xs"
                   icon="eyeOff"
                   iconPlacement="left"
-                  effect="ringHover"
                   tooltipTitle="Columns"
-                  tooltipProps={{
-                    side: "left",
-                  }}
                 />
               </DropdownMenuTrigger>
               <DropdownMenuContent
@@ -352,111 +349,174 @@ const DataTable = <T extends object>({
         <div className="rounded-md border">
           <div className="scrollbar-thin overflow-auto">
             <Table className="min-w-full divide-y divide-gray-200">
-              <TableHeader>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                      <TableHead
-                        key={header.id}
-                        style={{
-                          width: header.getSize(),
-                          position: "relative",
-                        }}
-                        className="rounded-md bg-background px-4 py-3"
-                      >
-                        {header.isPlaceholder ? null : (
-                          <div
-                            className={`flex items-center ${
-                              enableSorting && header.column.getCanSort()
-                                ? "cursor-pointer select-none hover:text-primary"
-                                : ""
-                            }`}
-                            onClick={
-                              enableSorting && header.column.getCanSort()
-                                ? header.column.getToggleSortingHandler()
-                                : undefined
-                            }
-                          >
-                            {flexRender(
-                              header.column.columnDef.header,
-                              header.getContext(),
-                            )}
-                            {enableSorting && header.column.getCanSort() && (
-                              <ArrowUpDown className="ml-2 h-4 w-4 text-muted-foreground transition-transform hover:scale-110" />
-                            )}
-                          </div>
-                        )}
-                        {enableResizing && header.column.getCanResize() && (
-                          <div
-                            onMouseDown={header.getResizeHandler()}
-                            onTouchStart={header.getResizeHandler()}
-                            className={`absolute right-0 top-3 h-5 w-[3px] cursor-col-resize rounded-md bg-gray-200 ${
-                              header.column.getIsResizing() ? "bg-primary" : ""
-                            }`}
-                          />
-                        )}
-                      </TableHead>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody>
-                <AnimatePresence>
-                  {isLoading
-                    ? // Loading state
-                      Array.from({ length: 5 }).map((_, index) => (
-                        <TableRow
-                          key={`loading-${index}`}
-                          className="animate-pulse border-b"
-                        >
-                          {table.getAllColumns().map((column) => (
-                            <TableCell key={column.id} className="px-4 py-3">
-                              <div className="h-4 w-full rounded bg-muted" />
-                            </TableCell>
-                          ))}
-                        </TableRow>
-                      ))
-                    : // Data rows
-                      table.getRowModel().rows.map((row) => (
-                        <motion.tr
-                          key={row.id}
-                          initial={{ opacity: 0, y: 5 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -5 }}
-                          transition={{
-                            type: "spring",
-                            stiffness: 300,
-                            damping: 20,
-                            duration: 0.2,
-                          }}
-                          onClick={
-                            onRowClick
-                              ? () => onRowClick(row.original)
-                              : undefined
-                          }
-                          style={{
-                            cursor: onRowClick ? "pointer" : "default",
-                          }}
-                          className="border-b transition-all duration-200 hover:bg-muted/50 hover:shadow-sm data-[state=selected]:bg-muted"
-                        >
-                          {row.getVisibleCells().map((cell) => (
-                            <TableCell
-                              key={cell.id}
-                              style={{ width: cell.column.getSize() }}
-                              className="px-4 py-3"
-                            >
-                              {renderCellContent(cell)}
-                            </TableCell>
-                          ))}
-                        </motion.tr>
-                      ))}
-                </AnimatePresence>
-              </TableBody>
+              <AnimatePresence>
+                <TableHeaderContent
+                  table={table}
+                  enableSorting={enableSorting}
+                  enableResizing={enableResizing}
+                />
+              </AnimatePresence>
+              <AnimatePresence>
+                <TableBodyContent
+                  isLoading={isLoading}
+                  table={table}
+                  onRowClick={onRowClick}
+                  renderCellContent={renderCellContent}
+                />
+              </AnimatePresence>
             </Table>
           </div>
         </div>
       )}
     </div>
+  );
+};
+
+const TableHeaderContent = <T,>({
+  table,
+  enableSorting,
+  enableResizing,
+}: {
+  table: TableType<T>;
+  enableSorting: boolean;
+  enableResizing: boolean;
+}) => {
+  return (
+    <TableHeader>
+      {table.getHeaderGroups().map((headerGroup) => (
+        <MotionTableRow
+          key={headerGroup.id}
+          initial={{ opacity: 0, y: 5 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -5 }}
+          transition={{
+            type: "spring",
+            stiffness: 300,
+            damping: 20,
+            duration: 0.2,
+          }}
+        >
+          {headerGroup.headers.map((header) => (
+            <TableHead
+              key={header.id}
+              style={{
+                width: header.getSize(),
+                position: "relative",
+              }}
+              className="rounded-md bg-background px-4 py-3"
+            >
+              {header.isPlaceholder ? null : (
+                <div
+                  className={`flex items-center ${
+                    enableSorting && header.column.getCanSort()
+                      ? "cursor-pointer select-none hover:text-primary"
+                      : ""
+                  }`}
+                  onClick={
+                    enableSorting && header.column.getCanSort()
+                      ? header.column.getToggleSortingHandler()
+                      : undefined
+                  }
+                >
+                  {flexRender(
+                    header.column.columnDef.header,
+                    header.getContext(),
+                  )}
+                  {enableSorting && header.column.getCanSort() && (
+                    <ArrowUpDown className="ml-2 h-4 w-4 text-muted-foreground transition-transform hover:scale-110" />
+                  )}
+                </div>
+              )}
+              {enableResizing && header.column.getCanResize() && (
+                <div
+                  onMouseDown={header.getResizeHandler()}
+                  onTouchStart={header.getResizeHandler()}
+                  className={`absolute right-0 top-3 h-5 w-[3px] cursor-col-resize rounded-md bg-gray-200 ${
+                    header.column.getIsResizing() ? "bg-primary" : ""
+                  }`}
+                />
+              )}
+            </TableHead>
+          ))}
+        </MotionTableRow>
+      ))}
+    </TableHeader>
+  );
+};
+
+const TableBodyContent = <T,>({
+  table,
+  isLoading,
+  onRowClick,
+  renderCellContent,
+}: {
+  isLoading: boolean;
+  table: TableType<T>;
+  onRowClick?: (row: T) => void;
+  renderCellContent: (cell: Cell<T, unknown>) => React.ReactNode;
+}) => {
+  if (isLoading) {
+    return (
+      <>
+        {Array.from({ length: 5 }).map((_, index) => (
+          <MotionTableRow
+            key={`loading-${index}`}
+            className="animate-pulse border-b"
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -5 }}
+            transition={{
+              type: "spring",
+              stiffness: 300,
+              damping: 20,
+              duration: 0.2,
+            }}
+          >
+            {table.getAllColumns().map((column) => (
+              <TableCell key={column.id} className="px-4 py-3">
+                <Skeleton className="h-4 w-full" />
+              </TableCell>
+            ))}
+          </MotionTableRow>
+        ))}
+      </>
+    );
+  }
+
+  return (
+    <>
+      <AnimatePresence>
+        {table.getRowModel().rows.map((row) => (
+          <MotionTableRow
+            key={row.id}
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -5 }}
+            transition={{
+              type: "spring",
+              stiffness: 300,
+              damping: 20,
+              duration: 0.2,
+            }}
+            onClick={onRowClick ? () => onRowClick(row.original) : undefined}
+            style={{
+              cursor: onRowClick ? "pointer" : "default",
+            }}
+            className="border-b transition-all duration-200 hover:bg-muted/50 hover:shadow-sm data-[state=selected]:bg-muted"
+          >
+            {row.getVisibleCells().map((cell) => (
+              <TableCell
+                key={cell.id}
+                style={{ width: cell.column.getSize() }}
+                className="px-4 py-3"
+              >
+                {renderCellContent(cell)}
+              </TableCell>
+            ))}
+          </MotionTableRow>
+        ))}
+      </AnimatePresence>
+    </>
   );
 };
 

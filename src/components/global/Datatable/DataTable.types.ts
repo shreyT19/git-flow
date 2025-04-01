@@ -1,13 +1,21 @@
+import { BadgeVariants } from "@/components/ui/badge";
 import { IButtonVariants } from "@/components/ui/button";
+import { IconType } from "@/utils/icons.utils";
 import { ColumnDef } from "@tanstack/react-table";
 import { ReactNode } from "react";
 
-// Define the column meta type
-export interface ColumnMeta {
-  type?: "date" | "tag" | "link";
-  // Add other meta properties as needed
-}
+type ITagMetaData = {
+  icon?: IconType;
+  variant?: BadgeVariants;
+};
 
+type IDateMetaData = {
+  format?: string;
+};
+
+export type ColumnMeta =
+  | { type: "tag"; metaData?: ITagMetaData }
+  | { type: "date"; metaData?: IDateMetaData };
 // Extend the ColumnDef type to include our custom meta
 export type DataTableColumn<TData, RowValue> = ColumnDef<TData, RowValue> & {
   meta?: ColumnMeta;
@@ -15,7 +23,7 @@ export type DataTableColumn<TData, RowValue> = ColumnDef<TData, RowValue> & {
 
 export interface ActionButton {
   label: string;
-  icon?: ReactNode;
+  icon?: IconType;
   onClick: () => void;
   variant?: IButtonVariants;
   disabled?: boolean;
@@ -32,9 +40,10 @@ export interface EmptyStateProps {
 
 export interface RowAction<T> {
   label: string;
-  icon?: ReactNode;
+  icon?: IconType;
   onClick: (row: T) => void;
   variant?: IButtonVariants;
+  className?: string;
   disabled?: (row: T) => boolean;
   hidden?: (row: T) => boolean;
 }

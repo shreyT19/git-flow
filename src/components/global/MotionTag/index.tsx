@@ -13,6 +13,7 @@ export const MotionUl = motion.ul;
 export const MotionLi = motion.li;
 export const MotionImg = motion.img;
 export const MotionA = motion.a;
+export const MotionTableRow = motion.tr;
 
 // You can also create more specialized components with default animations
 type AnimatedElementProps<T extends keyof JSX.IntrinsicElements> =
