@@ -34,7 +34,7 @@ import {
   DataTableProps,
   EmptyStateProps,
   RowAction,
-} from "./DataTable.types";
+} from "@/types/DataTable.types";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -48,7 +48,7 @@ import { SearchInput } from "./SearchInput";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MotionTableRow } from "../MotionTag";
 import { Badge } from "@/components/ui/badge";
-import { getIconForKeyword } from "@/utils/icons.utils";
+import { getIconForKeyword, IconType } from "@/utils/icons.utils";
 import ConditionalWrapper from "../ConditionalWrapper";
 import DropDownMenu from "../Dropdowns/DropDownMenu";
 
@@ -225,7 +225,9 @@ const DataTable = <T extends object>({
     },
   });
 
-  const isEmpty = table.getRowModel().rows.length === 0;
+  const isEmpty = table.getRowModel().rows.length === 0 && !isLoading;
+  const hasInitialData = data.length > 0;
+  const shouldShowSearch = enableFiltering && setSearchQuery && (hasInitialData || searchQuery);
 
   const EmptyState = ({
     searchText,
@@ -238,40 +240,45 @@ const DataTable = <T extends object>({
     const isFiltered = !!searchQuery;
 
     return (
-      <div className="flex flex-col items-center justify-center p-8 text-center">
-        <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-muted">
+      <div className="flex flex-col items-center justify-center p-12 text-center">
+        <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-muted/80 to-muted shadow-inner">
           {isFiltered
             ? searchIcon || (
-                <Search className="h-10 w-10 text-muted-foreground" />
+                <Search className="h-12 w-12 text-muted-foreground opacity-80" />
               )
             : defaultIcon || (
-                <Plus className="h-10 w-10 text-muted-foreground" />
+                <Plus className="h-12 w-12 text-muted-foreground opacity-80" />
               )}
         </div>
-        <h3 className="text-lg font-semibold">
+        <h3 className="text-xl font-medium text-primary/90">
           {isFiltered ? searchText : defaultText}
         </h3>
+        <p className="mt-2 max-w-md text-sm text-muted-foreground">
+          {isFiltered 
+            ? "Try adjusting your search or filters to find what you're looking for."
+            : "Get started by creating your first entry or try a different view."}
+        </p>
         {isFiltered && searchAction && (
           <Button
             variant={searchAction.variant || "outline"}
-            className="mt-4"
+            className="mt-6 shadow-sm transition-all hover:shadow"
             onClick={searchAction.onClick}
+            icon={searchAction.icon as IconType}
+            iconPlacement="left"
+            effect="ringHover"
           >
-            {searchAction.icon && (
-              <span className="mr-2">{searchAction.icon}</span>
-            )}
             {searchAction.label}
           </Button>
         )}
         {!isFiltered && defaultAction && (
           <Button
             variant={defaultAction.variant || "default"}
-            className="mt-4"
+            className="mt-6 shadow-sm transition-all hover:shadow"
             onClick={defaultAction.onClick}
+            icon={defaultAction.icon as IconType}
+            iconPlacement="left"
+            effect="ringHover"
           >
-            {defaultAction.icon && (
-              <span className="mr-2">{defaultAction.icon}</span>
-            )}
             {defaultAction.label}
           </Button>
         )}
@@ -284,7 +291,7 @@ const DataTable = <T extends object>({
       {/* Table toolbar */}
       <div className="flex items-center justify-between px-0.5 py-4">
         <div className="flex items-center gap-2">
-          {enableFiltering && setSearchQuery && (
+          {shouldShowSearch && (
             <SearchInput value={searchQuery} onChange={setSearchQuery} />
           )}
         </div>
@@ -300,7 +307,7 @@ const DataTable = <T extends object>({
               onClick={onRefresh}
             />
           )}
-          {enableColumnVisibility && (
+          {enableColumnVisibility && hasInitialData && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -323,9 +330,9 @@ const DataTable = <T extends object>({
                     <DropdownMenuCheckboxItem
                       key={column.id}
                       checked={column.getIsVisible()}
-                      onCheckedChange={(value) => {
-                        column.toggleVisibility(!!value);
-                      }}
+                      onCheckedChange={(value) =>
+                        column.toggleVisibility(!!value)
+                      }
                       onSelect={(e) => e.preventDefault()}
                       className="capitalize"
                     >
@@ -349,21 +356,17 @@ const DataTable = <T extends object>({
         <div className="rounded-md border">
           <div className="scrollbar-thin overflow-auto">
             <Table className="min-w-full divide-y divide-gray-200">
-              <AnimatePresence>
-                <TableHeaderContent
-                  table={table}
-                  enableSorting={enableSorting}
-                  enableResizing={enableResizing}
-                />
-              </AnimatePresence>
-              <AnimatePresence>
-                <TableBodyContent
-                  isLoading={isLoading}
-                  table={table}
-                  onRowClick={onRowClick}
-                  renderCellContent={renderCellContent}
-                />
-              </AnimatePresence>
+              <TableHeaderContent
+                table={table}
+                enableSorting={enableSorting}
+                enableResizing={enableResizing}
+              />
+              <TableBodyContent
+                isLoading={isLoading}
+                table={table}
+                onRowClick={onRowClick}
+                renderCellContent={renderCellContent}
+              />
             </Table>
           </div>
         </div>
@@ -382,65 +385,67 @@ const TableHeaderContent = <T,>({
   enableResizing: boolean;
 }) => {
   return (
-    <TableHeader>
-      {table.getHeaderGroups().map((headerGroup) => (
-        <MotionTableRow
-          key={headerGroup.id}
-          initial={{ opacity: 0, y: 5 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -5 }}
-          transition={{
-            type: "spring",
-            stiffness: 300,
-            damping: 20,
-            duration: 0.2,
-          }}
-        >
-          {headerGroup.headers.map((header) => (
-            <TableHead
-              key={header.id}
-              style={{
-                width: header.getSize(),
-                position: "relative",
-              }}
-              className="rounded-md bg-background px-4 py-3"
-            >
-              {header.isPlaceholder ? null : (
-                <div
-                  className={`flex items-center ${
-                    enableSorting && header.column.getCanSort()
-                      ? "cursor-pointer select-none hover:text-primary"
-                      : ""
-                  }`}
-                  onClick={
-                    enableSorting && header.column.getCanSort()
-                      ? header.column.getToggleSortingHandler()
-                      : undefined
-                  }
-                >
-                  {flexRender(
-                    header.column.columnDef.header,
-                    header.getContext(),
-                  )}
-                  {enableSorting && header.column.getCanSort() && (
-                    <ArrowUpDown className="ml-2 h-4 w-4 text-muted-foreground transition-transform hover:scale-110" />
-                  )}
-                </div>
-              )}
-              {enableResizing && header.column.getCanResize() && (
-                <div
-                  onMouseDown={header.getResizeHandler()}
-                  onTouchStart={header.getResizeHandler()}
-                  className={`absolute right-0 top-3 h-5 w-[3px] cursor-col-resize rounded-md bg-gray-200 ${
-                    header.column.getIsResizing() ? "bg-primary" : ""
-                  }`}
-                />
-              )}
-            </TableHead>
-          ))}
-        </MotionTableRow>
-      ))}
-    </TableHeader>
+    <AnimatePresence>
+      <TableHeader>
+        {table.getHeaderGroups().map((headerGroup) => (
+          <MotionTableRow
+            key={headerGroup.id}
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -5 }}
+            transition={{
+              type: "spring",
+              stiffness: 300,
+              damping: 20,
+              duration: 0.2,
+            }}
+          >
+            {headerGroup.headers.map((header) => (
+              <TableHead
+                key={header.id}
+                style={{
+                  width: header.getSize(),
+                  position: "relative",
+                }}
+                className="rounded-md bg-background px-4 py-3"
+              >
+                {header.isPlaceholder ? null : (
+                  <div
+                    className={`flex items-center ${
+                      enableSorting && header.column.getCanSort()
+                        ? "cursor-pointer select-none hover:text-primary"
+                        : ""
+                    }`}
+                    onClick={
+                      enableSorting && header.column.getCanSort()
+                        ? header.column.getToggleSortingHandler()
+                        : undefined
+                    }
+                  >
+                    {flexRender(
+                      header.column.columnDef.header,
+                      header.getContext(),
+                    )}
+                    {enableSorting && header.column.getCanSort() && (
+                      <ArrowUpDown className="ml-2 h-4 w-4 text-muted-foreground transition-transform hover:scale-110" />
+                    )}
+                  </div>
+                )}
+                {enableResizing && header.column.getCanResize() && (
+                  <div
+                    onMouseDown={header.getResizeHandler()}
+                    onTouchStart={header.getResizeHandler()}
+                    className={`absolute right-0 top-3 h-5 w-[3px] cursor-col-resize rounded-md bg-gray-200 ${
+                      header.column.getIsResizing() ? "bg-primary" : ""
+                    }`}
+                  />
+                )}
+              </TableHead>
+            ))}
+          </MotionTableRow>
+        ))}
+      </TableHeader>
+    </AnimatePresence>
   );
 };
 
@@ -455,68 +460,69 @@ const TableBodyContent = <T,>({
   onRowClick?: (row: T) => void;
   renderCellContent: (cell: Cell<T, unknown>) => React.ReactNode;
 }) => {
-  if (isLoading) {
-    return (
-      <>
-        {Array.from({ length: 5 }).map((_, index) => (
-          <MotionTableRow
-            key={`loading-${index}`}
-            className="animate-pulse border-b"
-            initial={{ opacity: 0, y: 5 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -5 }}
-            transition={{
-              type: "spring",
-              stiffness: 300,
-              damping: 20,
-              duration: 0.2,
-            }}
-          >
-            {table.getAllColumns().map((column) => (
-              <TableCell key={column.id} className="px-4 py-3">
-                <Skeleton className="h-4 w-full" />
-              </TableCell>
-            ))}
-          </MotionTableRow>
-        ))}
-      </>
-    );
-  }
-
+  // Use a consistent layout for both loading and data states
   return (
-    <>
-      <AnimatePresence>
-        {table.getRowModel().rows.map((row) => (
-          <MotionTableRow
-            key={row.id}
-            initial={{ opacity: 0, y: 5 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -5 }}
-            transition={{
-              type: "spring",
-              stiffness: 300,
-              damping: 20,
-              duration: 0.2,
-            }}
-            onClick={onRowClick ? () => onRowClick(row.original) : undefined}
-            style={{
-              cursor: onRowClick ? "pointer" : "default",
-            }}
-            className="border-b transition-all duration-200 hover:bg-muted/50 hover:shadow-sm data-[state=selected]:bg-muted"
-          >
-            {row.getVisibleCells().map((cell) => (
-              <TableCell
-                key={cell.id}
-                style={{ width: cell.column.getSize() }}
-                className="px-4 py-3"
-              >
-                {renderCellContent(cell)}
-              </TableCell>
-            ))}
-          </MotionTableRow>
-        ))}
-      </AnimatePresence>
-    </>
+    <AnimatePresence mode="wait">
+      {isLoading ? (
+        // Loading skeleton rows
+        <>
+          {Array.from({ length: 10 }).map((_, index) => (
+            <MotionTableRow
+              key={`loading-${index}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{
+                duration: 0.2,
+                ease: "easeInOut",
+              }}
+              className="border-b"
+            >
+              {table.getAllColumns().map((column) => (
+                <TableCell
+                  key={column.id}
+                  className="px-4 py-3"
+                  style={{ width: column.getSize() }}
+                >
+                  <Skeleton className="h-4 w-full" />
+                </TableCell>
+              ))}
+            </MotionTableRow>
+          ))}
+        </>
+      ) : (
+        // Actual data rows
+        <>
+          {table.getRowModel().rows.map((row) => (
+            <MotionTableRow
+              key={row.id}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{
+                duration: 0.2,
+                ease: "easeInOut",
+              }}
+              onClick={onRowClick ? () => onRowClick(row.original) : undefined}
+              style={{
+                cursor: onRowClick ? "pointer" : "default",
+              }}
+              className="border-b transition-all duration-200 hover:bg-muted/50 hover:shadow-sm data-[state=selected]:bg-muted"
+            >
+              {row.getVisibleCells().map((cell) => (
+                <TableCell
+                  key={cell.id}
+                  style={{ width: cell.column.getSize() }}
+                  className="px-4 py-3"
+                >
+                  {renderCellContent(cell)}
+                </TableCell>
+              ))}
+            </MotionTableRow>
+          ))}
+        </>
+      )}
+    </AnimatePresence>
   );
 };
 

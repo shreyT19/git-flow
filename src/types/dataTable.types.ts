@@ -30,8 +30,8 @@ export interface ActionButton {
 }
 
 export interface EmptyStateProps {
-  searchText: string;
-  defaultText: string;
+  searchText?: string;
+  defaultText?: string;
   searchIcon?: ReactNode;
   defaultIcon?: ReactNode;
   searchAction?: ActionButton;
@@ -53,7 +53,7 @@ export interface DataTableProps<T extends object> {
   columns: DataTableColumn<T, unknown>[];
   searchQuery?: string;
   setSearchQuery?: (value: string) => void;
-  emptyStateProps: EmptyStateProps;
+  emptyStateProps?: EmptyStateProps;
   enableResizing?: boolean;
   enableSorting?: boolean;
   enableFiltering?: boolean;

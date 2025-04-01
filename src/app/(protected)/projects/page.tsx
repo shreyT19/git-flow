@@ -9,9 +9,14 @@ import { SlideUpDiv } from "@/components/global/MotionTag";
 import { TitleDescriptionBox } from "@/components/global/Layouts/TitleDescriptionBox";
 import { useRouter } from "next/navigation";
 import CreateProject from "./__components/CreateProject";
+import { api } from "@/trpc/react";
 
 const ProjectsPage = () => {
-  const { projects } = useProject();
+  const {
+    data: projects,
+    isFetching: isLoading,
+    refetch: refetchProjects,
+  } = api.project.getProjects.useQuery();
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -19,15 +24,10 @@ const ProjectsPage = () => {
     project.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
-  const [rerenderKey, setRerenderKey] = useState(0);
-
   return (
     <>
       <CreateProject open={open} onOpenChange={() => setOpen(!open)} />
-      <SlideUpDiv
-        className="container mx-auto space-y-6 py-8"
-        key={rerenderKey}
-      >
+      <SlideUpDiv className="container mx-auto space-y-6 py-8">
         <div className="flex items-center justify-between">
           <TitleDescriptionBox
             title="Projects"
@@ -83,12 +83,6 @@ const ProjectsPage = () => {
             emptyStateProps={{
               searchText: "No projects found matching your search.",
               defaultText: "No projects found. Create your first project!",
-              searchIcon: (
-                <Search className="mb-2 h-8 w-8 text-muted-foreground/50" />
-              ),
-              defaultIcon: (
-                <Plus className="mb-2 h-8 w-8 text-muted-foreground/50" />
-              ),
               searchAction: {
                 label: "Clear search",
                 onClick: () => setSearchQuery(""),
@@ -100,8 +94,8 @@ const ProjectsPage = () => {
               },
             }}
             onRowClick={(row) => router.push(`/projects/${row?.id}`)}
-            onRefresh={() => setRerenderKey((prev) => prev + 1)}
-            // isLoading={true}
+            onRefresh={refetchProjects}
+            isLoading={isLoading}
             rowActions={[
               {
                 label: "View Details",
