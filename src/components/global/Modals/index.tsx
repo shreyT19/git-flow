@@ -9,6 +9,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button, ButtonProps } from "@/components/ui/button";
+import ConditionalWrapper from "../ConditionalWrapper";
 
 export type IModalProps = {
   modalOpen: boolean;
@@ -19,6 +20,7 @@ export type IModalProps = {
   confirmButtonProps?: ButtonProps;
   cancelButtonProps?: ButtonProps;
   closeOnClickOutside?: boolean;
+  showActions?: boolean;
 };
 
 const Modal = ({
@@ -30,6 +32,7 @@ const Modal = ({
   confirmButtonProps,
   cancelButtonProps,
   closeOnClickOutside = true,
+  showActions = true,
 }: IModalProps) => {
   return (
     <Dialog open={modalOpen} onOpenChange={setModalOpen} modal={true}>
@@ -45,25 +48,27 @@ const Modal = ({
             <div>{children}</div>
           </div>
         </DialogHeader>
-        <DialogFooter>
-          <Button
-            {...cancelButtonProps}
-            variant="outline"
-            onClick={(e) => {
-              cancelButtonProps?.onClick?.(e);
-              setModalOpen(false);
-            }}
-          >
-            Cancel
-          </Button>
-          <Button
-            {...confirmButtonProps}
-            variant="destructive"
-            onClick={(e) => confirmButtonProps?.onClick?.(e)}
-          >
-            Confirm
-          </Button>
-        </DialogFooter>
+        <ConditionalWrapper show={showActions}>
+          <DialogFooter>
+            <Button
+              {...cancelButtonProps}
+              variant="outline"
+              onClick={(e) => {
+                cancelButtonProps?.onClick?.(e);
+                setModalOpen(false);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              {...confirmButtonProps}
+              variant="destructive"
+              onClick={(e) => confirmButtonProps?.onClick?.(e)}
+            >
+              Confirm
+            </Button>
+          </DialogFooter>
+        </ConditionalWrapper>
       </DialogContent>
     </Dialog>
   );

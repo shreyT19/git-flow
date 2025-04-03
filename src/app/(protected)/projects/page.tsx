@@ -96,21 +96,6 @@ const ProjectsPage = () => {
             onRowClick={(row) => router.push(`/projects/${row?.id}`)}
             onRefresh={refetchProjects}
             isLoading={isLoading}
-            rowActions={[
-              {
-                label: "View Details",
-                onClick: () => {},
-              },
-              {
-                label: "Edit",
-                onClick: () => {},
-              },
-              {
-                label: "Delete",
-                variant: "destructive",
-                onClick: () => {},
-              },
-            ]}
           />
         </div>
       </SlideUpDiv>
