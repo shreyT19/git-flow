@@ -30,10 +30,12 @@ import {
   Dot,
   Pencil,
   Trash,
+  UserPlus,
 } from "lucide-react";
 
 export const iconMap = {
   plus: <Plus />,
+  userPlus: <UserPlus />,
   workflow: <Workflow />,
   externalLink: <ExternalLink />,
   save: <SaveIcon />,
