@@ -6,11 +6,20 @@ import "./src/env.js";
 
 /** @type {import("next").NextConfig} */
 const config = {
+  images: {
+    domains: [
+      "img.clerk.com",
+      "images.clerk.dev",
+      "avatars.githubusercontent.com",
+      "github.com",
+      "raw.githubusercontent.com",
+    ],
+  },
   async redirects() {
     return [
       {
-        source: '/',
-        destination: '/dashboard',
+        source: "/",
+        destination: "/dashboard",
         permanent: true,
       },
     ];

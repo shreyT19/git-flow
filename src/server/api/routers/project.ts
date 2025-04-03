@@ -30,8 +30,12 @@ import {
   getMeetingTranscriptsByMeetingId,
   uploadMeeting,
 } from "@/actions/meeting/repository";
+import { getTeamMembers } from "@/actions/user/repository";
 
 export const projectRouter = createTRPCRouter({
+  getTeamMembers: privateProcedure
+    .input(getProjectIdSchema)
+    .query(async ({ input }) => await getTeamMembers(input?.projectId)),
   createProject: privateProcedure
     .input(createProjectValidationSchema)
     .mutation(async ({ ctx, input }) => {

@@ -9,6 +9,7 @@ import { api } from "@/trpc/react";
 import { IProjectResponse } from "@/types/project.types";
 import { motion } from "motion/react";
 import { ICommitResponse } from "@/types/commit.types";
+import { IUserResponse } from "@/types/user.types";
 
 const Dashboard = () => {
   const { id } = useParams();
@@ -23,6 +24,14 @@ const Dashboard = () => {
       projectId: id as string,
     });
 
+  const { data: teamMembers, isLoading: isTeamMembersLoading } =
+    api.project.getTeamMembers.useQuery({
+      projectId: id as string,
+    });
+
+  const isLoading =
+    isProjectLoading || isCommitsLoading || isTeamMembersLoading;
+
   return (
     <div>
       <div className="mt-3 flex flex-col gap-6 pb-12">
@@ -30,10 +39,12 @@ const Dashboard = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
+          className="sticky -top-2 z-10 border-b bg-gray-50 pb-4 pt-2"
         >
           <HeaderActions
-            isLoading={isProjectLoading || isCommitsLoading}
+            isLoading={isLoading}
             project={project as IProjectResponse}
+            teamMembers={teamMembers as IUserResponse[]}
           />
         </motion.div>
         <motion.div
@@ -44,10 +55,10 @@ const Dashboard = () => {
         >
           <QuestionCard
             project={project as IProjectResponse}
-            isLoading={isProjectLoading || isCommitsLoading}
+            isLoading={isLoading}
           />
           <MeetingCard
-            isLoading={isProjectLoading || isCommitsLoading}
+            isLoading={isLoading}
             project={project as IProjectResponse}
           />
         </motion.div>
@@ -57,7 +68,7 @@ const Dashboard = () => {
           transition={{ duration: 0.5, delay: 0.4 }}
         >
           <CommitLog
-            isLoading={isProjectLoading || isCommitsLoading}
+            isLoading={isLoading}
             project={project as IProjectResponse}
             commits={commits as ICommitResponse[]}
           />

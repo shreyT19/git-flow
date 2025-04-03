@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/server/db";
-import type { IUser } from "@/types/user.types";
+import type { IUser, IUserResponse } from "@/types/user.types";
 
 /**
  *  Upsert a user into the database
@@ -74,12 +74,12 @@ export const addUserToProject = async (userId: string, projectId: string) => {
  * @returns
  */
 export const getTeamMembers = async (projectId: string) => {
-  return await db.userToProject.findMany({
+  return (await db.userToProject.findMany({
     where: {
       projectId,
     },
     include: {
       user: true,
     },
-  });
+  })) as IUserResponse[];
 };

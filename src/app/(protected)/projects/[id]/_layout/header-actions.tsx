@@ -8,56 +8,18 @@ import React from "react";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScriptCopyBtn } from "@/components/magicui/script-copy-btn";
+import { AvatarCircles } from "@/components/magicui/avatar-circles";
+import { IUserResponse } from "@/types/user.types";
 
 const HeaderActions = ({
   project,
   isLoading,
+  teamMembers,
 }: {
   project: IProjectResponse;
   isLoading: boolean;
+  teamMembers: IUserResponse[];
 }) => {
-  const archiveProject = api.project.archiveProject.useMutation();
-
-  const { confirm, close } = useModal();
-
-  const handleArchiveProject = () => {
-    confirm({
-      title: "Archive Project",
-      children: (
-        <p className="flex flex-col gap-2 text-sm text-muted-foreground">
-          <span>
-            You will still be able to access the project under the archived
-            projects. You will also be able to unarchive the project if you want
-            to.
-          </span>
-          <span className="text-xs font-semibold text-red-500">
-            Note: The archived project will be automatically deleted after 30
-            days.
-          </span>
-        </p>
-      ),
-      cancelButtonProps: {
-        onClick: close,
-      },
-      confirmButtonProps: {
-        onClick: () =>
-          archiveProject.mutate(
-            { projectId: project?.id! },
-            {
-              onSuccess: () => {
-                toast.success("Project archived successfully 🎉");
-                close();
-              },
-              onError: (error) =>
-                toast.error(
-                  `There was an error archiving the project 😢 : ${error?.message}`,
-                ),
-            },
-          ),
-      },
-    });
-  };
-
   if (isLoading) {
     return (
       <div className="flex flex-wrap items-center justify-between">
@@ -66,15 +28,19 @@ const HeaderActions = ({
           <div className="flex items-center">
             <Skeleton className="size-5 rounded-full bg-white/20" />
             <div className="ml-2">
-              <Skeleton className="h-4 w-72 bg-white/20" />
+              <Skeleton className="h-4 rounded-md bg-white/20 sm:w-48 md:w-80" />
             </div>
           </div>
         </div>
         {/* Actions Skeleton */}
         <div className="flex items-center gap-4">
-          <Skeleton className="h-9 w-32 rounded-md bg-gray-200" />
-          <Skeleton className="h-9 w-32 rounded-md bg-gray-200" />
-          <Skeleton className="h-9 w-32 rounded-md bg-gray-200" />
+          <div className="flex -space-x-2">
+            <Skeleton className="size-10 rounded-full bg-gray-200" />
+            <Skeleton className="size-10 rounded-full bg-gray-200" />
+            <Skeleton className="size-10 rounded-full bg-gray-200" />
+          </div>
+          <Skeleton className="h-9 w-24 rounded-md bg-gray-200" />
+          <Skeleton className="h-9 w-24 rounded-md bg-gray-200" />
         </div>
       </div>
     );
@@ -102,7 +68,7 @@ const HeaderActions = ({
         </div>
       </div>
       <div className="flex items-center gap-4">
-        <span>Team Members</span>
+        <TeamMembers members={teamMembers} />
         <InviteButton projectId={project?.id!} />
         <ArchiveProjectButton projectId={project?.id!} />
       </div>
@@ -171,9 +137,9 @@ const InviteButton = ({ projectId }: { projectId: string }) => {
   const handleInviteUser = () => {
     const inviteUrl = `${window.location.origin}/join/${projectId}`;
 
-    navigator.clipboard.writeText(inviteUrl).then(() => {
-      toast.success("Invite link copied to clipboard ✅");
-    });
+    navigator.clipboard
+      .writeText(inviteUrl)
+      .then(() => toast.success("Invite link copied to clipboard ✅"));
 
     confirm({
       title: "Invite User",
@@ -191,6 +157,10 @@ const InviteButton = ({ projectId }: { projectId: string }) => {
             commandMap={{
               invite: inviteUrl,
             }}
+            onAfterCopy={() => {
+              toast.success("Invite link copied to clipboard ✅");
+              close();
+            }}
           />
         </div>
       ),
@@ -207,6 +177,21 @@ const InviteButton = ({ projectId }: { projectId: string }) => {
     >
       Invite
     </Button>
+  );
+};
+
+const TeamMembers = ({ members }: { members: IUserResponse[] }) => {
+  return (
+    <AvatarCircles
+      avatarUrls={
+        members?.map((member) => {
+          return {
+            imageUrl: member?.user?.imageURL ?? "",
+            name: `${member?.user?.firstName} ${member?.user?.lastName}`,
+          };
+        }) ?? []
+      }
+    />
   );
 };
 
