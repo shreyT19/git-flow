@@ -95,7 +95,7 @@ export const AnimatedTabs = ({
                 layoutId="clickedbutton"
                 transition={{ type: "spring", bounce: 0.3, duration: 0.6 }}
                 className={cn(
-                  "absolute inset-0 rounded-full bg-primary dark:bg-zinc-800",
+                  "absolute inset-0 rounded-md bg-primary dark:bg-zinc-800",
                   activeTabClassName,
                 )}
               />
@@ -103,9 +103,9 @@ export const AnimatedTabs = ({
 
             <span
               className={cn(
-                "relative block",
+                "relative block font-medium",
                 active?.value === tab.value
-                  ? "font-medium text-white"
+                  ? "text-white"
                   : "text-gray-700 dark:text-gray-300",
               )}
             >
