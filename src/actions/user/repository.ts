@@ -29,3 +29,57 @@ export const upsertUser = async (user: IUser) => {
     },
   });
 };
+
+/**
+ *  Get a user by their id
+ *  Returns the user object
+ * @param userId
+ * @returns
+ */
+export const getUserById = async (userId: string) => {
+  return await db.user.findUnique({
+    where: { id: userId },
+  });
+};
+
+/**
+ *  Add a user to a project
+ *  Creates a new user to project relationship
+ *  Returns the user to project relationship
+ *  If the user is already in the project, it will return the existing relationship
+ * @param userId
+ * @param projectId
+ * @returns
+ */
+export const addUserToProject = async (userId: string, projectId: string) => {
+  return await db.userToProject.upsert({
+    where: {
+      userId_projectId: {
+        userId,
+        projectId,
+      },
+    },
+    update: {},
+    create: {
+      userId,
+      projectId,
+    },
+  });
+};
+
+/**
+ *  Get all team members for a project
+ *  Returns an array of user objects
+ * @param projectId
+ * @returns
+ */
+export const getTeamMembers = async (projectId: string) => {
+  return await db.userToProject.findMany({
+    where: {
+      projectId,
+    },
+    include: {
+      user: true,
+    },
+  });
+};
