@@ -38,7 +38,7 @@ const Dashboard = () => {
   return (
     <div>
       <div className="mt-3 flex flex-col gap-6 pb-12">
-        <FadeInDiv className="sticky -top-2 z-10 border-b bg-gray-50 pb-4 pt-2">
+        <FadeInDiv className="sticky -top-2 z-[1] border-b bg-gray-50 pb-4 pt-2">
           <HeaderActions
             isLoading={isLoading}
             project={project as IProjectResponse}

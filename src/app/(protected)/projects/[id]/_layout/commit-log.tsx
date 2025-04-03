@@ -59,16 +59,16 @@ const CommitCardSkeleton = ({ index }: { index: number }) => {
         <div className="translate-x-1 border-r border-dashed border-gray-200" />
       </div>
       <>
-        <Skeleton className="relative size-8 flex-none rounded-full border-2 border-white bg-gray-200 shadow-xl" />
-        <div className="flex-auto rounded-md border border-gray-200 bg-white p-3 shadow-md">
+        <Skeleton className="relative size-8 flex-none rounded-full border-2 border-white shadow-xl" />
+        <div className="flex-auto rounded-md border border-gray-200 p-3 shadow-md">
           <div className="flex justify-between gap-x-4">
             <div className="flex gap-1.5 py-0.5 text-xs leading-5">
-              <Skeleton className="h-4 w-24 bg-gray-200" />
-              <Skeleton className="h-4 w-16 bg-gray-200" />
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-4 w-16" />
             </div>
           </div>
-          <Skeleton className="mt-1 h-5 w-3/4 bg-gray-200" />
-          <Skeleton className="mt-2 h-16 w-full bg-gray-200" />
+          <Skeleton className="mt-1 h-5 w-3/4" />
+          <Skeleton className="mt-2 h-16 w-full" />
         </div>
       </>
     </li>

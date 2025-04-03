@@ -26,21 +26,21 @@ const HeaderActions = ({
         {/* Github Link Skeleton */}
         <div className="w-fit rounded-md bg-primary px-4 py-3">
           <div className="flex items-center">
-            <Skeleton className="size-5 rounded-full bg-white/20" />
+            <Skeleton className="size-5 rounded-full" />
             <div className="ml-2">
-              <Skeleton className="h-4 rounded-md bg-white/20 sm:w-48 md:w-80" />
+              <Skeleton className="h-4 rounded-md sm:w-48 md:w-80" />
             </div>
           </div>
         </div>
         {/* Actions Skeleton */}
         <div className="flex items-center gap-4">
           <div className="flex -space-x-2">
-            <Skeleton className="size-10 rounded-full bg-gray-200" />
-            <Skeleton className="size-10 rounded-full bg-gray-200" />
-            <Skeleton className="size-10 rounded-full bg-gray-200" />
+            <Skeleton className="size-10 rounded-full" />
+            <Skeleton className="size-10 rounded-full" />
+            <Skeleton className="size-10 rounded-full" />
           </div>
-          <Skeleton className="h-9 w-24 rounded-md bg-gray-200" />
-          <Skeleton className="h-9 w-24 rounded-md bg-gray-200" />
+          <Skeleton className="h-9 w-24 rounded-md" />
+          <Skeleton className="h-9 w-24 rounded-md" />
         </div>
       </div>
     );
