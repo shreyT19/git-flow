@@ -6,7 +6,6 @@ import { Check, Copy } from "lucide-react";
 import { motion } from "motion/react";
 import { useTheme } from "next-themes";
 import { HTMLAttributes, useEffect, useState } from "react";
-import { toast } from "sonner";
 
 interface ScriptCopyBtnProps extends HTMLAttributes<HTMLDivElement> {
   showMultiplePackageOptions?: boolean;
@@ -15,6 +14,7 @@ interface ScriptCopyBtnProps extends HTMLAttributes<HTMLDivElement> {
   darkTheme: string;
   commandMap: Record<string, string>;
   className?: string;
+  onAfterCopy?: () => void;
 }
 
 export function ScriptCopyBtn({
@@ -24,6 +24,7 @@ export function ScriptCopyBtn({
   darkTheme,
   commandMap,
   className,
+  onAfterCopy,
 }: ScriptCopyBtnProps) {
   const packageManagers = Object.keys(commandMap);
   const [packageManager, setPackageManager] = useState(packageManagers[0]);
@@ -55,10 +56,10 @@ export function ScriptCopyBtn({
   }, [command, theme, codeLanguage, lightTheme, darkTheme]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(command);
+    navigator.clipboard.writeText(command ?? "");
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-    toast.success("Copied to clipboard ✅");
+    onAfterCopy?.();
   };
 
   return (
