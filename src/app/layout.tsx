@@ -6,6 +6,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "sonner";
 import { ModalProvider } from "@/providers/ModalProvider";
 import Transition from "@/providers/TransitionProvider";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 export const metadata: Metadata = {
   title: "Git Flow",
@@ -20,17 +21,19 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en" className={`${GeistSans.variable}`}>
         <body>
-          <ModalProvider>
-            <Toaster
-              richColors
-              closeButton
-              position="top-right"
-              duration={3500}
-            />
-            <Transition>
-              <TRPCReactProvider>{children}</TRPCReactProvider>
-            </Transition>
-          </ModalProvider>
+          <NuqsAdapter>
+            <ModalProvider>
+              <Toaster
+                richColors
+                closeButton
+                position="top-right"
+                duration={3500}
+              />
+              <Transition>
+                <TRPCReactProvider>{children}</TRPCReactProvider>
+              </Transition>
+            </ModalProvider>
+          </NuqsAdapter>
         </body>
       </html>
     </ClerkProvider>
