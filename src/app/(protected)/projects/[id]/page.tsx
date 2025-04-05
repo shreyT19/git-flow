@@ -1,21 +1,16 @@
 "use client";
-import React from "react";
-import CommitLog from "./_layout/commit-log";
+import React, { useMemo } from "react";
 import HeaderActions from "./_layout/header-actions";
-import QuestionCard from "./_layout/question-card";
-import MeetingCard from "./_layout/meeting-card";
 import { useParams } from "next/navigation";
 import { api } from "@/trpc/react";
 import { IProjectResponse } from "@/types/project.types";
 import { ICommitResponse } from "@/types/commit.types";
 import { IUserResponse } from "@/types/user.types";
-import { AnimatedTabs } from "@/components/aceternityui/animated-tabs";
 import { FadeInDiv } from "@/components/global/MotionTag";
-import { useQueryState } from "nuqs";
+import ViewProjectTabs from "./_layout/tabs/project-tabs";
 
 const Dashboard = () => {
   const { id } = useParams();
-  const [tab, setTab] = useQueryState("tab", { defaultValue: "commits" });
 
   const { data: project, isLoading: isProjectLoading } =
     api.project.getProjectById.useQuery({
@@ -32,8 +27,10 @@ const Dashboard = () => {
       projectId: id as string,
     });
 
-  const isLoading =
-    isProjectLoading || isCommitsLoading || isTeamMembersLoading;
+  const isLoading = useMemo(
+    () => isProjectLoading || isCommitsLoading || isTeamMembersLoading,
+    [isProjectLoading, isCommitsLoading, isTeamMembersLoading],
+  );
 
   return (
     <div>
@@ -45,46 +42,10 @@ const Dashboard = () => {
             teamMembers={teamMembers as IUserResponse[]}
           />
         </FadeInDiv>
-
-        <AnimatedTabs
-          key={isLoading ? "loading" : "loaded"}
-          activeTab={tab}
-          onTabChange={setTab}
-          tabs={[
-            {
-              title: "Commits",
-              value: "commits",
-              content: (
-                <CommitLog
-                  isLoading={isLoading}
-                  project={project as IProjectResponse}
-                  commits={commits as ICommitResponse[]}
-                />
-              ),
-            },
-            {
-              title: "Q&A",
-              value: "qa",
-              content: (
-                <QuestionCard
-                  project={project as IProjectResponse}
-                  isLoading={isLoading}
-                />
-              ),
-            },
-            {
-              title: "Meetings",
-              value: "meetings",
-              content: (
-                <MeetingCard
-                  isLoading={isLoading}
-                  project={project as IProjectResponse}
-                />
-              ),
-            },
-          ]}
-          containerClassName="mb-6"
-          contentClassName="mt-6"
+        <ViewProjectTabs
+          isLoading={isLoading}
+          project={project as IProjectResponse}
+          commits={commits as ICommitResponse[]}
         />
       </div>
     </div>

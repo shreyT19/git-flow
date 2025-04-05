@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import QuestionCard from "../projects/[id]/_layout/question-card";
+import QuestionCard from "../projects/[id]/_layout/tabs/question-card";
 import FileReferences from "../projects/[id]/_layout/file-references";
 import useProject from "@/services/project";
 import { api } from "@/trpc/react";

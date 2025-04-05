@@ -9,7 +9,7 @@ import React, { useState } from "react";
 import { SaveIcon } from "lucide-react";
 import { api } from "@/trpc/react";
 import { toast } from "sonner";
-import FileReferences from "./file-references";
+import FileReferences from "../file-references";
 import useRefetch from "@/hooks/useRefetch";
 import { IProjectResponse } from "@/types/project.types";
 import { Skeleton } from "@/components/ui/skeleton";

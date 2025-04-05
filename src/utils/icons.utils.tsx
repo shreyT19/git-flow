@@ -31,6 +31,12 @@ import {
   Pencil,
   Trash,
   UserPlus,
+  Bot,
+  CreditCard,
+  Folders,
+  LayoutDashboard,
+  Presentation,
+  GitCommit,
 } from "lucide-react";
 
 export const iconMap = {
@@ -65,6 +71,12 @@ export const iconMap = {
   dot: <Dot />,
   edit: <Pencil />,
   trash: <Trash />,
+  bot: <Bot />,
+  creditCard: <CreditCard />,
+  folders: <Folders />,
+  layoutDashboard: <LayoutDashboard />,
+  presentation: <Presentation />,
+  gitCommit: <GitCommit />,
 } as const;
 
 export type IconType = keyof typeof iconMap;

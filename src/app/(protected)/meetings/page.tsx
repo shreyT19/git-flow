@@ -2,7 +2,7 @@
 import useProject from "@/services/project";
 import { api } from "@/trpc/react";
 import React from "react";
-import MeetingCard from "../projects/[id]/_layout/meeting-card";
+import MeetingCard from "../projects/[id]/_layout/tabs/meeting-card";
 import { Loader2 } from "lucide-react";
 import ConditionalWrapper from "@/components/global/ConditionalWrapper";
 import Link from "next/link";

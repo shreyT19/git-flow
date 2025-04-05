@@ -24,7 +24,7 @@ const HeaderActions = ({
     return (
       <div className="flex flex-wrap items-center justify-between">
         {/* Github Link Skeleton */}
-        <div className="w-fit rounded-md bg-primary px-4 py-3">
+        <div className="w-fit rounded-md bg-primary/10 px-4 py-3">
           <div className="flex items-center">
             <Skeleton className="size-5 rounded-full" />
             <div className="ml-2">

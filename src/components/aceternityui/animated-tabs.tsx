@@ -3,11 +3,13 @@
 import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { cn } from "@/utils/tailwind.utils";
+import { type IconType, getIconForKeyword } from "@/utils/icons.utils";
 
 type Tab = {
   title: string;
   value: string;
   content?: string | React.ReactNode | any;
+  icon?: IconType;
 };
 
 export const AnimatedTabs = ({
@@ -68,6 +70,10 @@ export const AnimatedTabs = ({
 
   const [hovering, setHovering] = useState(false);
 
+  const isActive = (tab: Tab) => {
+    return tab.value === active?.value;
+  };
+
   return (
     <>
       <div
@@ -85,12 +91,16 @@ export const AnimatedTabs = ({
             }}
             onMouseEnter={() => setHovering(true)}
             onMouseLeave={() => setHovering(false)}
-            className={cn("relative rounded-full px-4 py-2", tabClassName)}
+            className={cn(
+              "relative mr-2 rounded-md px-4 py-2",
+              !isActive(tab) && "bg-primary/5",
+              tabClassName,
+            )}
             style={{
               transformStyle: "preserve-3d",
             }}
           >
-            {active?.value === tab.value && (
+            {isActive(tab) && (
               <motion.div
                 layoutId="clickedbutton"
                 transition={{ type: "spring", bounce: 0.3, duration: 0.6 }}
@@ -103,12 +113,13 @@ export const AnimatedTabs = ({
 
             <span
               className={cn(
-                "relative block font-medium",
-                active?.value === tab.value
+                "relative flex items-center gap-2 text-sm font-medium",
+                isActive(tab)
                   ? "text-white"
-                  : "text-gray-700 dark:text-gray-300",
+                  : "text-primary dark:text-gray-300",
               )}
             >
+              {tab?.icon && getIconForKeyword(tab?.icon)}
               {tab.title}
             </span>
           </button>
