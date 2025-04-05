@@ -38,6 +38,7 @@ import {
   Presentation,
   GitCommit,
   BookCopy,
+  FileQuestion,
 } from "lucide-react";
 
 export const iconMap = {
@@ -79,6 +80,7 @@ export const iconMap = {
   presentation: <Presentation />,
   gitCommit: <GitCommit />,
   bookCopy: <BookCopy />,
+  fileQuestion: <FileQuestion />,
 } as const;
 
 export type IconType = keyof typeof iconMap;

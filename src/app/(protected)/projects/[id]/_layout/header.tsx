@@ -77,7 +77,7 @@ const ProjectDetailsRow = ({ project }: { project: IProjectResponse }) => {
         <div className="flex items-center gap-2">
           <Badge
             variant="outline"
-            className="flex items-center bg-gray-100 text-gray-600"
+            className="flex items-center gap-2 bg-gray-100 text-gray-600"
           >
             {getIconForKeyword("gitCommit", "size-3.5")}
             Added on{" "}

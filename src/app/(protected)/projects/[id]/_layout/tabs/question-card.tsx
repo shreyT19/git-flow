@@ -13,6 +13,12 @@ import FileReferences from "../file-references";
 import useRefetch from "@/hooks/useRefetch";
 import { IProjectResponse } from "@/types/project.types";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { getIconForKeyword } from "@/utils/icons.utils";
 
 const QuestionCardSkeleton = () => {
   return (
@@ -39,6 +45,7 @@ const QuestionCard = ({
   project: IProjectResponse;
   isLoading?: boolean;
 }) => {
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
   const [question, setQuestion] = useState<string>("");
   const [open, setOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -99,22 +106,41 @@ const QuestionCard = ({
   return (
     <>
       <Card className="col-span-3">
-        <CardHeader>
-          <CardTitle>Ask a question</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-            <Textarea
-              placeholder="Which file should I change to edit the homepage?"
-              value={question}
-              onChange={(e) => setQuestion(e.target.value)}
-              rows={5}
-            />
-            <Button className="w-fit" type="submit" disabled={loading}>
-              Ask AI!
-            </Button>
-          </form>
-        </CardContent>
+        <Collapsible open={isCollapsed}>
+          <CollapsibleTrigger className="w-full">
+            <div
+              className="flex w-full items-center justify-between gap-2"
+              onClick={() => setIsCollapsed(!isCollapsed)}
+            >
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  {getIconForKeyword("fileQuestion", "size-4")}
+                  Ask a question
+                </CardTitle>
+              </CardHeader>
+              {getIconForKeyword(
+                isCollapsed ? "chevronDown" : "chevronUp",
+                "size-4 mr-4",
+              )}
+            </div>
+          </CollapsibleTrigger>
+
+          <CollapsibleContent>
+            <CardContent>
+              <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+                <Textarea
+                  placeholder="Which file should I change to edit the homepage?"
+                  value={question}
+                  onChange={(e) => setQuestion(e.target.value)}
+                  rows={5}
+                />
+                <Button className="w-fit" type="submit" disabled={loading}>
+                  Ask AI!
+                </Button>
+              </form>
+            </CardContent>
+          </CollapsibleContent>
+        </Collapsible>
       </Card>
       <FileReferences
         open={open}
