@@ -2,8 +2,6 @@
 import React, { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { Plus, Search } from "lucide-react";
-import useProject from "@/services/project";
 import DataTable from "@/components/global/Datatable";
 import { SlideUpDiv } from "@/components/global/MotionTag";
 import { TitleDescriptionBox } from "@/components/global/Layouts/TitleDescriptionBox";

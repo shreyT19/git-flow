@@ -10,6 +10,7 @@ import {
 import {
   saveAnswer,
   getQuestionsByProjectId,
+  getQuestionsByUserId,
 } from "@/actions/question/repository";
 import { createTRPCRouter, privateProcedure } from "@/server/api/trpc";
 import { indexGithubRepo } from "@/libs/langchain.libs";
@@ -80,6 +81,9 @@ export const projectRouter = createTRPCRouter({
     .query(
       async ({ input }) => await getQuestionsByProjectId(input?.projectId),
     ),
+  getQuestionsByUserId: privateProcedure.query(
+    async ({ ctx }) => await getQuestionsByUserId(ctx.user.userId!),
+  ),
   createMeeting: privateProcedure
     .input(createMeetingValidationSchema)
     .mutation(async ({ input }) => {

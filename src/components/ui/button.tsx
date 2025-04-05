@@ -4,7 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/utils/tailwind.utils";
 import { getIconForKeyword, IconType } from "@/utils/icons.utils";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ToolTip, { IToolTipProps } from "@/components/ui/tooltip";
 
 const buttonVariants = cva(
@@ -113,6 +113,10 @@ const ButtonComponent = React.forwardRef<
         setIsLoading(false);
       }
     };
+
+    useEffect(() => {
+      setIsLoading(loading);
+    }, [loading]);
 
     const showLeftIcon =
       Icon &&

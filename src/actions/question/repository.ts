@@ -47,3 +47,31 @@ export const getQuestionsByProjectId = async (projectId: string) => {
     },
   });
 };
+
+export const getQuestionsByUserId = async (userId: string) => {
+  return await db.question.findMany({
+    where: {
+      userId: userId,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          imageURL: true,
+          emailAddress: true,
+        },
+      },
+      project: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  });
+};

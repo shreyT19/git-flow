@@ -18,7 +18,7 @@ export const Typography = {
   }: Omit<HTMLMotionProps<"h1">, "ref">) => (
     <MotionH1
       className={cn(
-        "text-xl font-bold tracking-tight md:text-2xl lg:text-3xl",
+        "text-lg font-bold tracking-tight md:text-xl lg:text-2xl",
         className,
       )}
       {...props}
@@ -33,7 +33,7 @@ export const Typography = {
   }: Omit<HTMLMotionProps<"h2">, "ref">) => (
     <MotionH2
       className={cn(
-        "text-lg font-semibold tracking-tight md:text-xl",
+        "text-md font-semibold tracking-tight md:text-lg",
         className,
       )}
       {...props}
@@ -48,7 +48,7 @@ export const Typography = {
   }: Omit<HTMLMotionProps<"h3">, "ref">) => (
     <MotionH3
       className={cn(
-        "text-base font-semibold tracking-tight md:text-lg",
+        "text-sm font-semibold tracking-tight md:text-base",
         className,
       )}
       {...props}
@@ -96,9 +96,8 @@ export const TitleDescriptionBox: React.FC<TitleDescriptionBoxProps> = ({
   // Define variant-specific styles
   const variantStyles = {
     primary: {
-      title:
-        "bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent",
-      description: "text-muted-foreground",
+      title: "text-foreground/70",
+      description: "text-muted-foreground/80 text-sm",
     },
     secondary: {
       title: "text-foreground",

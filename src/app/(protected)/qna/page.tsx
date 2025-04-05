@@ -1,71 +1,35 @@
 "use client";
 import React, { useState } from "react";
-import QuestionCard from "../projects/[id]/_layout/tabs/question-card";
 import FileReferences from "../projects/[id]/_layout/file-references";
-import useProject from "@/services/project";
 import { api } from "@/trpc/react";
 import { IQuestionResponse } from "@/types/question.types";
 import ToolTip from "@/components/ui/tooltip";
 import { ISourceCodeEmbedding } from "@/types/sourceCodeEmbedding.types";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getIconForKeyword } from "@/utils/icons.utils";
+import DataTable from "@/components/global/Datatable";
+import { SlideUpDiv } from "@/components/global/MotionTag";
+import { TitleDescriptionBox } from "@/components/global/Layouts/TitleDescriptionBox";
+import Link from "next/link";
 
 const QnaPage = () => {
   const [open, setOpen] = useState<boolean>(false);
-
-  const { selectedProjectId } = useProject();
-
-  const { data: questions } = api.project.getQuestions.useQuery({
-    projectId: selectedProjectId,
-  });
-
   const [selectedQuestion, setSelectedQuestion] =
     useState<IQuestionResponse | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const {
+    data: questions,
+    isFetching: isLoading,
+    refetch: refetchQuestions,
+  } = api.project.getQuestionsByUserId.useQuery();
+
+  const filteredQuestions = questions?.filter((question) =>
+    question.question.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
 
   return (
     <>
-      <div className="mt-3 flex flex-col gap-6">
-        <QuestionCard />
-
-        <div className="flex flex-col gap-3">
-          <h1 className="text-lg font-semibold text-primary">
-            Saved Questions
-          </h1>
-        </div>
-      </div>
-
-      <div className="mt-4 flex flex-col gap-3">
-        {questions?.map((question, index) => (
-          <div
-            key={index}
-            className="flex gap-4 rounded-lg border bg-white p-4 shadow-md transition-all duration-300 hover:cursor-pointer hover:bg-gray-50"
-            onClick={() => {
-              setOpen(true);
-              setSelectedQuestion(question as unknown as IQuestionResponse);
-            }}
-          >
-            <ToolTip
-              title={`${question?.user?.firstName} ${question?.user?.lastName}`}
-            >
-              <img
-                src={question?.user?.imageURL ?? ""}
-                className="h-8 w-8 rounded-full"
-              />
-            </ToolTip>
-            <div className="flex flex-col text-left">
-              <div className="flex w-full items-center justify-between gap-2">
-                <p className="line-clamp-1 text-base font-medium text-gray-700 first-letter:uppercase">
-                  {question?.question}
-                </p>
-                <p className="whitespace-nowrap text-sm text-gray-500">
-                  {question?.createdAt.toLocaleDateString()}
-                </p>
-              </div>
-              <p className="line-clamp-2 text-sm text-gray-500">
-                {question?.answer}
-              </p>
-            </div>
-          </div>
-        ))}
-      </div>
       <FileReferences
         open={open && selectedQuestion !== null}
         onOpenChange={() => {
@@ -77,6 +41,69 @@ const QnaPage = () => {
         }
         answer={selectedQuestion?.answer ?? ""}
       />
+
+      <SlideUpDiv className="container mx-auto space-y-6 py-8">
+        <TitleDescriptionBox
+          title="Questions & Answers"
+          titleAs="h1"
+          description="View all questions asked across your projects"
+        />
+
+        <div className="overflow-hidden">
+          <DataTable
+            data={filteredQuestions || []}
+            columns={[
+              {
+                header: "Question",
+                accessorKey: "question",
+                cell: (info) => (
+                  <span className="font-medium">
+                    {info.getValue() as string}
+                  </span>
+                ),
+              },
+              {
+                header: "Project",
+                accessorKey: "project.name",
+                cell: (info) => (
+                  <Link
+                    href={`/projects/${info.row.original.project.id}`}
+                    className="font-medium text-primary hover:underline"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent the row click event from firing
+                    }}
+                  >
+                    {info.getValue() as string}
+                  </Link>
+                ),
+              },
+              {
+                header: "Created At",
+                accessorKey: "createdAt",
+                meta: { type: "date" },
+              },
+            ]}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            onRefresh={refetchQuestions}
+            emptyStateProps={{
+              searchText: "No questions found matching your search.",
+              defaultText: "No questions found. Ask a question in a project!",
+              searchAction: {
+                label: "Clear search",
+                onClick: () => setSearchQuery(""),
+              },
+            }}
+            onRowClick={(row) => {
+              setSelectedQuestion(row as unknown as IQuestionResponse);
+              setOpen(true);
+            }}
+            isLoading={isLoading}
+          />
+        </div>
+      </SlideUpDiv>
     </>
   );
 };
