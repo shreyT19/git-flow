@@ -56,7 +56,6 @@ const ViewProjectTabs = ({ isLoading, project, commits }: Props) => {
           ),
         },
       ]}
-      containerClassName="mb-6"
       contentClassName="mt-6"
     />
   );

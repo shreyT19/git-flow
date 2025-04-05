@@ -33,7 +33,7 @@ const ViewProjectPage = () => {
 
   return (
     <div>
-      <div className="mt-3 flex flex-col gap-6 pb-12">
+      <div className="mt-3 flex scroll-pb-16 flex-col gap-6">
         <ProjectHeaderWithActions
           isLoading={isLoading}
           project={project as IProjectResponse}
