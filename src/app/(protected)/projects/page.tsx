@@ -53,7 +53,7 @@ const ProjectsPage = () => {
                 header: "Name",
                 accessorKey: "name",
                 cell: (info) => (
-                  <span className="font-medium text-primary">
+                  <span className="font-medium">
                     {info.getValue() as string}
                   </span>
                 ),

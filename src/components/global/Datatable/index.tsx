@@ -18,6 +18,7 @@ import {
   TableCell,
   TableHead,
   TableHeader,
+  TableBody,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import {
@@ -463,67 +464,69 @@ const TableBodyContent = <T,>({
 }) => {
   // Use a consistent layout for both loading and data states
   return (
-    <AnimatePresence mode="wait">
-      {isLoading ? (
-        // Loading skeleton rows
-        <>
-          {Array.from({ length: 10 }).map((_, index) => (
-            <MotionTableRow
-              key={`loading-${index}`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{
-                duration: 0.2,
-                ease: "easeInOut",
-              }}
-              className="border-b"
-            >
-              {table.getAllColumns().map((column) => (
-                <TableCell
-                  key={column.id}
-                  className="px-4 py-3"
-                  style={{ width: column.getSize() }}
-                >
-                  <Skeleton className="h-4 w-full" />
-                </TableCell>
-              ))}
-            </MotionTableRow>
-          ))}
-        </>
-      ) : (
-        // Actual data rows
-        <>
-          {table.getRowModel().rows.map((row) => (
-            <MotionTableRow
-              key={row.id}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{
-                duration: 0.2,
-                ease: "easeInOut",
-              }}
-              onClick={onRowClick ? () => onRowClick(row.original) : undefined}
-              style={{
-                cursor: onRowClick ? "pointer" : "default",
-              }}
-              className="border-b transition-all duration-200 hover:bg-muted/50 hover:shadow-sm data-[state=selected]:bg-muted"
-            >
-              {row.getVisibleCells().map((cell) => (
-                <TableCell
-                  key={cell.id}
-                  style={{ width: cell.column.getSize() }}
-                  className="px-4 py-3"
-                >
-                  {renderCellContent(cell)}
-                </TableCell>
-              ))}
-            </MotionTableRow>
-          ))}
-        </>
-      )}
-    </AnimatePresence>
+    <TableBody>
+      <AnimatePresence mode="wait">
+        {isLoading ? (
+          // Loading skeleton rows
+          <>
+            {Array.from({ length: 10 }).map((_, index) => (
+              <MotionTableRow
+                key={`loading-${index}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{
+                  duration: 0.2,
+                  ease: "easeInOut",
+                }}
+                className="border-b"
+              >
+                {table.getAllColumns().map((column) => (
+                  <TableCell
+                    key={column.id}
+                    className="px-4 py-3"
+                    style={{ width: column.getSize() }}
+                  >
+                    <Skeleton className="h-4 w-full" />
+                  </TableCell>
+                ))}
+              </MotionTableRow>
+            ))}
+          </>
+        ) : (
+          // Actual data rows
+          <>
+            {table.getRowModel().rows.map((row) => (
+              <MotionTableRow
+                key={row.id}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{
+                  duration: 0.2,
+                  ease: "easeInOut",
+                }}
+                onClick={onRowClick ? () => onRowClick(row.original) : undefined}
+                style={{
+                  cursor: onRowClick ? "pointer" : "default",
+                }}
+                className="border-b transition-all duration-200 hover:bg-muted/50 hover:shadow-sm data-[state=selected]:bg-muted"
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell
+                    key={cell.id}
+                    style={{ width: cell.column.getSize() }}
+                    className="px-4 py-3"
+                  >
+                    {renderCellContent(cell)}
+                  </TableCell>
+                ))}
+              </MotionTableRow>
+            ))}
+          </>
+        )}
+      </AnimatePresence>
+    </TableBody>
   );
 };
 
