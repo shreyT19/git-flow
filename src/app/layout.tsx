@@ -23,12 +23,7 @@ export default function RootLayout({
         <body>
           <NuqsAdapter>
             <ModalProvider>
-              <Toaster
-                richColors
-                closeButton
-                position="top-right"
-                duration={3500}
-              />
+              <Toaster richColors position="top-center" duration={1500} />
               <Transition>
                 <TRPCReactProvider>{children}</TRPCReactProvider>
               </Transition>

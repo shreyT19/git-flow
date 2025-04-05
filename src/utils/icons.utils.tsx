@@ -1,4 +1,4 @@
-import { ReactElement } from "react";
+import React, { ReactElement } from "react";
 import {
   Plus,
   Workflow,
@@ -37,6 +37,7 @@ import {
   LayoutDashboard,
   Presentation,
   GitCommit,
+  BookCopy,
 } from "lucide-react";
 
 export const iconMap = {
@@ -77,6 +78,7 @@ export const iconMap = {
   layoutDashboard: <LayoutDashboard />,
   presentation: <Presentation />,
   gitCommit: <GitCommit />,
+  bookCopy: <BookCopy />,
 } as const;
 
 export type IconType = keyof typeof iconMap;
@@ -89,7 +91,11 @@ export const getIconForKeyword = (
 ) => {
   if (typeof keyword !== "string") return keyword;
   if (typeof keyword === "string" && keyword in iconMap) {
-    return <span className={`${className}`}>{iconMap[keyword]}</span>;
+    const icon = iconMap[keyword];
+    if (className) {
+      return React.cloneElement(icon, { className });
+    }
+    return icon;
   }
   return fallbackIcon;
 };

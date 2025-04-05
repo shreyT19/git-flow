@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { useModal } from "@/providers/ModalProvider";
 import { api } from "@/trpc/react";
 import { IProjectResponse } from "@/types/project.types";
-import { ExternalLink, Github } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import { toast } from "sonner";
@@ -10,8 +9,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ScriptCopyBtn } from "@/components/magicui/script-copy-btn";
 import { AvatarCircles } from "@/components/magicui/avatar-circles";
 import { IUserResponse } from "@/types/user.types";
+import { getIconForKeyword } from "@/utils/icons.utils";
+import { Badge } from "@/components/ui/badge";
 
-const HeaderActions = ({
+const ProjectHeaderWithActions = ({
   project,
   isLoading,
   teamMembers,
@@ -20,57 +21,110 @@ const HeaderActions = ({
   isLoading: boolean;
   teamMembers: IUserResponse[];
 }) => {
-  if (isLoading) {
-    return (
+  if (isLoading) return <ProjectHeaderSkeleton />;
+
+  return (
+    <div className="sticky -top-2 z-[1] flex flex-col gap-4 border-b bg-gray-50 pb-6 pt-2">
+      {/* Project Details Row */}
+      <ProjectDetailsRow project={project} />
+      {/* Github and Team Row */}
+      <GithubLinkRow project={project} teamMembers={teamMembers} />
+    </div>
+  );
+};
+
+const ProjectHeaderSkeleton = () => {
+  return (
+    <div className="flex animate-pulse flex-col gap-4 rounded-lg py-2">
+      {/* Project Title and Date Skeleton */}
       <div className="flex flex-wrap items-center justify-between">
-        {/* Github Link Skeleton */}
-        <div className="w-fit rounded-md bg-primary/10 px-4 py-3">
-          <div className="flex items-center">
-            <Skeleton className="size-5 rounded-full" />
-            <div className="ml-2">
-              <Skeleton className="h-4 rounded-md sm:w-48 md:w-80" />
-            </div>
-          </div>
+        <div className="flex flex-wrap items-center gap-4">
+          <Skeleton className="h-8 w-48 rounded-md" />
+          <Skeleton className="h-6 w-36 rounded-full" />
         </div>
-        {/* Actions Skeleton */}
+        <Skeleton className="h-9 w-28 rounded-md" />
+      </div>
+
+      {/* Github and Team Row Skeleton */}
+      <div className="flex flex-wrap items-center justify-between">
+        <Skeleton className="h-11 w-64 rounded-lg" />
         <div className="flex items-center gap-4">
-          <div className="flex -space-x-2">
-            <Skeleton className="size-10 rounded-full" />
-            <Skeleton className="size-10 rounded-full" />
-            <Skeleton className="size-10 rounded-full" />
+          <div className="flex -space-x-3">
+            {[1, 2, 3].map((i) => (
+              <Skeleton
+                key={i}
+                className="size-10 rounded-full border-2 border-white"
+              />
+            ))}
           </div>
-          <Skeleton className="h-9 w-24 rounded-md" />
-          <Skeleton className="h-9 w-24 rounded-md" />
+          <Skeleton className="h-9 w-28 rounded-md" />
         </div>
       </div>
-    );
-  }
+    </div>
+  );
+};
 
+const ProjectDetailsRow = ({ project }: { project: IProjectResponse }) => {
+  return (
+    <div className="flex flex-wrap items-center justify-between">
+      <div className="flex flex-wrap items-center gap-4">
+        <div className="flex items-center gap-2 text-gray-700">
+          {getIconForKeyword("bookCopy", "size-5 text-gray-500")}
+          <h1 className="text-xl font-semibold tracking-tight text-gray-500">
+            {project?.name}
+          </h1>
+        </div>
+        <div className="flex items-center gap-2">
+          <Badge
+            variant="outline"
+            className="flex items-center bg-gray-100 text-gray-600"
+          >
+            {getIconForKeyword("gitCommit", "size-3.5")}
+            Added on{" "}
+            {new Date(project?.createdAt).toLocaleDateString("en-US", {
+              month: "long",
+              day: "numeric",
+              year: "numeric",
+            })}
+          </Badge>
+        </div>
+      </div>
+      <ArchiveProjectButton projectId={project?.id!} />
+    </div>
+  );
+};
+
+const GithubLinkRow = ({
+  project,
+  teamMembers,
+}: {
+  project: IProjectResponse;
+  teamMembers: IUserResponse[];
+}) => {
   return (
     <div className="flex flex-wrap items-center justify-between">
       {/* Github Link */}
-      <div className="w-fit rounded-md bg-primary px-4 py-3">
-        <div className="flex items-center">
-          <Github className="size-5 text-white" />
-          <div className="ml-2">
-            <p className="text-sm font-medium text-white">
-              This project is linked to{" "}
-              <Link
-                href={project?.githubUrl ?? ""}
-                target="_blank"
-                className="inline-flex items-center gap-1.5 text-white/80 hover:underline"
-              >
-                <span>{project?.githubUrl}</span>
-                <ExternalLink className="size-4" />
-              </Link>
-            </p>
-          </div>
+      {project?.githubUrl && (
+        <div className="group flex items-center gap-3 overflow-hidden rounded-lg bg-white px-4 py-3 shadow-sm ring-1 ring-primary/10 transition-all duration-300 hover:shadow-md hover:ring-primary/20">
+          {getIconForKeyword("github", "size-4")}
+          <Link
+            href={project?.githubUrl}
+            target="_blank"
+            className="inline-flex items-center gap-2 text-xs font-medium text-gray-700 transition-all duration-300 group-hover:text-primary"
+          >
+            <span className="max-w-[180px] truncate border-b border-dashed border-transparent transition-all duration-300 group-hover:border-primary md:max-w-[240px] lg:max-w-[320px]">
+              {project?.githubUrl.replace(
+                /https?:\/\/(www\.)?github\.com\//,
+                "",
+              )}
+            </span>
+            {getIconForKeyword("externalLink", "size-4")}
+          </Link>
         </div>
-      </div>
+      )}
       <div className="flex items-center gap-4">
         <TeamMembers members={teamMembers} />
         <InviteButton projectId={project?.id!} />
-        <ArchiveProjectButton projectId={project?.id!} />
       </div>
     </div>
   );
@@ -83,6 +137,7 @@ const ArchiveProjectButton = ({ projectId }: { projectId: string }) => {
   const handleArchiveProject = () => {
     confirm({
       title: "Archive Project",
+      closeOnClickOutside: true,
       children: (
         <p className="flex flex-col gap-2 text-sm text-muted-foreground">
           <span>
@@ -195,4 +250,4 @@ const TeamMembers = ({ members }: { members: IUserResponse[] }) => {
   );
 };
 
-export default HeaderActions;
+export default ProjectHeaderWithActions;
