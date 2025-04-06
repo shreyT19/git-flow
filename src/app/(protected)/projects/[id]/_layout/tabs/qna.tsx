@@ -9,7 +9,7 @@ import React, { useState } from "react";
 import { SaveIcon } from "lucide-react";
 import { api } from "@/trpc/react";
 import { toast } from "sonner";
-import FileReferences from "../file-references";
+import FileReferences from "../../../../../../components/modules/projects/file-references";
 import useRefetch from "@/hooks/useRefetch";
 import { IProjectResponse } from "@/types/project.types";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -19,57 +19,14 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { getIconForKeyword } from "@/utils/icons.utils";
-import QnaPage from "@/app/(protected)/qna/page";
 import { IQuestionResponse } from "@/types/question.types";
 import ToolTip from "@/components/ui/tooltip";
+import EmptyPlaceHolder from "@/components/global/Layouts/empty-placeholder";
 
-const QuestionCardSkeleton = () => {
-  return (
-    <>
-      <Card className="col-span-3">
-        <CardHeader>
-          <Skeleton className="h-6 w-40" />
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col gap-4">
-            <Skeleton className="h-24 w-full" />
-            <Skeleton className="h-10 w-24" />
-          </div>
-        </CardContent>
-      </Card>
-    </>
-  );
-};
-
-const QnaLoadingSkeleton = () => {
-  return (
-    <div className="mt-4 flex flex-col gap-3">
-      {[1, 2, 3].map((index) => (
-        <div
-          key={index}
-          className="flex gap-4 rounded-lg border bg-white p-4 shadow-md"
-        >
-          <Skeleton className="h-8 w-8 rounded-full" />
-          <div className="flex w-full flex-col text-left">
-            <div className="flex w-full items-center justify-between gap-2">
-              <Skeleton className="h-5 w-3/4" />
-              <Skeleton className="h-4 w-24" />
-            </div>
-            <Skeleton className="mt-2 h-4 w-full" />
-            <Skeleton className="mt-1 h-4 w-2/3" />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-};
-
-const QuestionCard = ({
+const QnaTab = ({
   project: selectedProjectDetails,
-  isLoading = false,
 }: {
   project: IProjectResponse;
-  isLoading?: boolean;
 }) => {
   // File References Sidebar State
   const [open, setOpen] = useState<boolean>(false);
@@ -108,8 +65,6 @@ const QuestionCard = ({
     );
   };
 
-  if (isLoading) return <QuestionCardSkeleton />;
-
   return (
     <>
       {/* File References Sidebar */}
@@ -142,8 +97,8 @@ const QuestionCard = ({
         setAnswer={setAnswer}
         setFileReferences={setFileReferences}
       />
-      {/* Questions */}
-      <Questions projectId={selectedProjectDetails?.id ?? ""} />
+      {/* Saved Answers */}
+      <SavedAnswers projectId={selectedProjectDetails?.id ?? ""} />
     </>
   );
 };
@@ -238,7 +193,7 @@ const CollapsibleQuestionCard = ({
   );
 };
 
-const Questions = ({ projectId }: { projectId: string }) => {
+const SavedAnswers = ({ projectId }: { projectId: string }) => {
   const [open, setOpen] = useState<boolean>(false);
 
   const { data: questions, isLoading } = api.project.getQuestions.useQuery({
@@ -261,49 +216,44 @@ const Questions = ({ projectId }: { projectId: string }) => {
       </div>
 
       <div className="mt-4 flex flex-col gap-3">
-        {questions?.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-xl border border-gray-200/80 bg-gradient-to-br from-white to-gray-50 px-8 py-12 text-center shadow-sm">
-            <div className="mb-3 rounded-full bg-gray-100/80 p-3">
-              {getIconForKeyword("fileQuestion", "size-6 text-gray-400")}
-            </div>
-            <p className="text-gray-500">
-              Ask a question about your project and save it to see it here
-            </p>
-          </div>
-        ) : (
-          questions?.map((question, index) => (
-            <div
-              key={index}
-              className="group flex gap-4 rounded-xl border border-gray-200/80 bg-gradient-to-br from-white to-gray-50 p-4 shadow-sm transition-all duration-300 hover:border-primary/20 hover:shadow-md hover:shadow-primary/5"
-              onClick={() => {
-                setOpen(true);
-                setSelectedQuestion(question as unknown as IQuestionResponse);
-              }}
+        <EmptyPlaceHolder
+          visible={questions?.length === 0}
+          icon="fileQuestion"
+          text="Ask a question about your project and save it to see it here"
+        />
+
+        {questions?.map((question, index) => (
+          <div
+            key={index}
+            className="group flex gap-4 rounded-xl border border-gray-200/80 bg-gradient-to-br from-white to-gray-50 p-4 shadow-sm transition-all duration-300 hover:border-primary/20 hover:shadow-md hover:shadow-primary/5"
+            onClick={() => {
+              setOpen(true);
+              setSelectedQuestion(question as unknown as IQuestionResponse);
+            }}
+          >
+            <ToolTip
+              title={`${question?.user?.firstName} ${question?.user?.lastName}`}
             >
-              <ToolTip
-                title={`${question?.user?.firstName} ${question?.user?.lastName}`}
-              >
-                <img
-                  src={question?.user?.imageURL ?? ""}
-                  className="h-10 w-10 rounded-full border-2 border-white shadow-sm"
-                />
-              </ToolTip>
-              <div className="flex w-full flex-col text-left">
-                <div className="flex w-full items-center justify-between gap-2">
-                  <p className="line-clamp-1 text-base font-medium text-gray-800 first-letter:uppercase group-hover:text-primary">
-                    {question?.question}
-                  </p>
-                  <p className="whitespace-nowrap text-xs font-medium text-gray-400">
-                    {question?.createdAt.toLocaleDateString()}
-                  </p>
-                </div>
-                <p className="mt-1 line-clamp-2 text-sm text-gray-500">
-                  {question?.answer}
+              <img
+                src={question?.user?.imageURL ?? ""}
+                className="h-10 w-10 rounded-full border-2 border-white shadow-sm"
+              />
+            </ToolTip>
+            <div className="flex w-full flex-col text-left">
+              <div className="flex w-full items-center justify-between gap-2">
+                <p className="line-clamp-1 text-base font-medium text-gray-800 first-letter:uppercase group-hover:text-primary">
+                  {question?.question}
+                </p>
+                <p className="whitespace-nowrap text-xs font-medium text-gray-400">
+                  {question?.createdAt.toLocaleDateString()}
                 </p>
               </div>
+              <p className="mt-1 line-clamp-2 text-sm text-gray-500">
+                {question?.answer}
+              </p>
             </div>
-          ))
-        )}
+          </div>
+        ))}
       </div>
       <FileReferences
         open={open && selectedQuestion !== null}
@@ -320,6 +270,27 @@ const Questions = ({ projectId }: { projectId: string }) => {
   );
 };
 
-// const Questions
+const QnaLoadingSkeleton = () => {
+  return (
+    <div className="mt-4 flex flex-col gap-3">
+      {[1, 2, 3].map((index) => (
+        <div
+          key={index}
+          className="flex gap-4 rounded-lg border bg-white p-4 shadow-md"
+        >
+          <Skeleton className="h-8 w-8 rounded-full" />
+          <div className="flex w-full flex-col text-left">
+            <div className="flex w-full items-center justify-between gap-2">
+              <Skeleton className="h-5 w-3/4" />
+              <Skeleton className="h-4 w-24" />
+            </div>
+            <Skeleton className="mt-2 h-4 w-full" />
+            <Skeleton className="mt-1 h-4 w-2/3" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
 
-export default QuestionCard;
+export default QnaTab;

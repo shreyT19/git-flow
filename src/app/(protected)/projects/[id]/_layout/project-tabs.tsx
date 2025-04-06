@@ -1,8 +1,8 @@
 import { AnimatedTabs } from "@/components/aceternityui/animated-tabs";
 import React from "react";
-import CommitLog from "./commit-log";
-import QuestionCard from "./question-card";
-import MeetingCard from "./meeting-card";
+import CommitLogTab from "./tabs/commit-log";
+import QnaTab from "./tabs/qna";
+import MeetingsTab from "./tabs/meetings";
 import { IProjectResponse } from "@/types/project.types";
 import { useQueryState } from "nuqs";
 import { ICommitResponse } from "@/types/commit.types";
@@ -26,7 +26,7 @@ const ViewProjectTabs = ({ isLoading, project, commits }: Props) => {
           title: "Commits",
           value: "commits",
           content: (
-            <CommitLog
+            <CommitLogTab
               isLoading={isLoading}
               project={project as IProjectResponse}
               commits={commits as ICommitResponse[]}
@@ -37,23 +37,13 @@ const ViewProjectTabs = ({ isLoading, project, commits }: Props) => {
           icon: "bot",
           title: "Q&A",
           value: "qa",
-          content: (
-            <QuestionCard
-              project={project as IProjectResponse}
-              isLoading={isLoading}
-            />
-          ),
+          content: <QnaTab project={project as IProjectResponse} />,
         },
         {
           icon: "presentation",
           title: "Meetings",
           value: "meetings",
-          content: (
-            <MeetingCard
-              isLoading={isLoading}
-              project={project as IProjectResponse}
-            />
-          ),
+          content: <MeetingsTab project={project as IProjectResponse} />,
         },
       ]}
       contentClassName="mt-6"

@@ -6,7 +6,7 @@ import { api } from "@/trpc/react";
 import { IProjectResponse } from "@/types/project.types";
 import { ICommitResponse } from "@/types/commit.types";
 import { IUserResponse } from "@/types/user.types";
-import ViewProjectTabs from "./_layout/tabs/project-tabs";
+import ViewProjectTabs from "./_layout/project-tabs";
 
 const ViewProjectPage = () => {
   const { id } = useParams();

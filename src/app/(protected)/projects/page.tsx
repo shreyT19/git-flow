@@ -4,9 +4,9 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import DataTable from "@/components/global/Datatable";
 import { SlideUpDiv } from "@/components/global/MotionTag";
-import { TitleDescriptionBox } from "@/components/global/Layouts/TitleDescriptionBox";
+import { TitleDescriptionBox } from "@/components/global/Layouts/title-description-box";
 import { useRouter } from "next/navigation";
-import CreateProject from "./__components/CreateProject";
+import CreateProject from "../../../components/modules/projects/create-project";
 import { api } from "@/trpc/react";
 
 const ProjectsPage = () => {

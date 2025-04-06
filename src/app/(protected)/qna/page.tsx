@@ -1,15 +1,12 @@
 "use client";
 import React, { useState } from "react";
-import FileReferences from "../projects/[id]/_layout/file-references";
+import FileReferences from "../../../components/modules/projects/file-references";
 import { api } from "@/trpc/react";
 import { IQuestionResponse } from "@/types/question.types";
-import ToolTip from "@/components/ui/tooltip";
 import { ISourceCodeEmbedding } from "@/types/sourceCodeEmbedding.types";
-import { Skeleton } from "@/components/ui/skeleton";
-import { getIconForKeyword } from "@/utils/icons.utils";
 import DataTable from "@/components/global/Datatable";
 import { SlideUpDiv } from "@/components/global/MotionTag";
-import { TitleDescriptionBox } from "@/components/global/Layouts/TitleDescriptionBox";
+import { TitleDescriptionBox } from "@/components/global/Layouts/title-description-box";
 import Link from "next/link";
 
 const QnaPage = () => {

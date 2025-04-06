@@ -57,16 +57,6 @@ const buttonVariants = cva(
 export type ButtonVariants = VariantProps<typeof buttonVariants>;
 export type IButtonVariants = NonNullable<ButtonVariants["variant"]>;
 
-interface IconProps {
-  icon: IconType;
-  iconPlacement: "left" | "right";
-}
-
-interface IconRefProps {
-  icon?: never;
-  iconPlacement?: undefined;
-}
-
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
@@ -76,14 +66,11 @@ export interface ButtonProps
   onClick?: React.MouseEventHandler<HTMLButtonElement> | (() => Promise<void>);
   tooltipTitle?: string;
   tooltipProps?: Omit<IToolTipProps, "title" | "children">;
+  icon?: IconType;
+  iconPlacement?: "left" | "right";
 }
 
-export type ButtonIconProps = IconProps | IconRefProps;
-
-const ButtonComponent = React.forwardRef<
-  HTMLButtonElement,
-  ButtonProps & ButtonIconProps
->(
+const ButtonComponent = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
       className,
@@ -167,22 +154,21 @@ const ButtonComponent = React.forwardRef<
 ButtonComponent.displayName = "ButtonComponent";
 
 // Button wrapper with tooltip support
-const Button = React.forwardRef<
-  HTMLButtonElement,
-  ButtonProps & ButtonIconProps
->((props, ref) => {
-  const { tooltipTitle, tooltipProps, ...buttonProps } = props;
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  (props, ref) => {
+    const { tooltipTitle, tooltipProps, ...buttonProps } = props;
 
-  if (tooltipTitle) {
-    return (
-      <ToolTip title={tooltipTitle} {...tooltipProps}>
-        <ButtonComponent ref={ref} {...buttonProps} />
-      </ToolTip>
-    );
-  }
+    if (tooltipTitle) {
+      return (
+        <ToolTip title={tooltipTitle} {...tooltipProps}>
+          <ButtonComponent ref={ref} {...buttonProps} />
+        </ToolTip>
+      );
+    }
 
-  return <ButtonComponent ref={ref} {...buttonProps} />;
-});
+    return <ButtonComponent ref={ref} {...buttonProps} />;
+  },
+);
 
 Button.displayName = "Button";
 

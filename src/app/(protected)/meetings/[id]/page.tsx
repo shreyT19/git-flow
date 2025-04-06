@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import TranscriptsList from "./_components/transcripts-list";
+import TranscriptsList from "../../../../components/modules/meetings/transcripts-list";
 
 type Props = {
   params: { id: string };
