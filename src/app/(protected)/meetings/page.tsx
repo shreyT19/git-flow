@@ -11,17 +11,15 @@ import { TitleDescriptionBox } from "@/components/global/Layouts/title-descripti
 import useProject from "@/services/project";
 
 const MeetingsPage = () => {
-  const { selectedProjectId: projectId } = useProject();
   const [searchQuery, setSearchQuery] = useState("");
 
   const {
     data: meetings,
     isLoading,
     refetch: refetchMeetings,
-  } = api.project.getMeetingsUserHasAccessTo.useQuery(
-    { projectId },
-    { refetchInterval: 4000 }, //* Refetch every 4 seconds to check if the meeting has been processed or not
-  );
+  } = api.project.getMeetingsUserHasAccessTo.useQuery(undefined, {
+    refetchInterval: 4000,
+  });
 
   const filteredMeetings = meetings?.filter((meeting) =>
     meeting.name.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -65,7 +63,7 @@ const MeetingsPage = () => {
                   e.stopPropagation(); // Prevent the row click event from firing
                 }}
               >
-                View Project
+                {info.row.original?.project?.name}
               </Link>
             ),
           },
@@ -73,17 +71,6 @@ const MeetingsPage = () => {
             header: "Created At",
             accessorKey: "createdAt",
             meta: { type: "date" },
-          },
-          {
-            header: "Actions",
-            id: "actions",
-            cell: (info) => (
-              <Link href={`/meetings/${info.row.original.id}`}>
-                <Button variant="outline" size="sm">
-                  View Meeting
-                </Button>
-              </Link>
-            ),
           },
         ]}
         searchQuery={searchQuery}

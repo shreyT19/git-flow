@@ -118,12 +118,9 @@ export const projectRouter = createTRPCRouter({
       async ({ input }) =>
         await getMeetingTranscriptsByMeetingId(input?.meetingId),
     ),
-  getMeetingsUserHasAccessTo: privateProcedure
-    .input(getProjectIdSchema)
-    .query(
-      async ({ input, ctx }) =>
-        await getMeetingsByUserId(ctx.user.userId!, input?.projectId),
-    ),
+  getMeetingsUserHasAccessTo: privateProcedure.query(
+    async ({ input, ctx }) => await getMeetingsByUserId(ctx.user.userId!),
+  ),
   deleteMeeting: privateProcedure
     .input(getMeetingIdSchema)
     .mutation(async ({ input }) => await deleteMeeting(input?.meetingId)),

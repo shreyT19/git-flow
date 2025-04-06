@@ -91,16 +91,24 @@ export const deleteMeeting = async (id: string) =>
 export const getMeetingTranscriptsByMeetingId = async (meetingId: string) =>
   await db.meetingTranscript.findMany({ where: { meetingId } });
 
-export const getMeetingsByUserId = async (userId: string, projectId: string) =>
-  await db.meeting.findMany({
+export const getMeetingsByUserId = async (userId: string) => {
+  //first get all projects that the user has access to
+  const projects = await db.userToProject.findMany({
+    where: { userId },
+    include: { project: true },
+  });
+
+  //then get all meetings that are associated with the projects
+  const meetings = await db.meeting.findMany({
     where: {
-      projectId,
-      project: {
-        userToProjects: {
-          some: {
-            userId,
-          },
-        },
+      projectId: {
+        in: projects.map((project) => project.projectId),
       },
     },
+    include: {
+      project: true,
+    },
   });
+
+  return meetings;
+};
