@@ -29,6 +29,7 @@ import {
   deleteMeeting,
   getMeetingById,
   getMeetingsByProjectId,
+  getMeetingsByUserId,
   getMeetingTranscriptsByMeetingId,
   uploadMeeting,
 } from "@/actions/meeting/repository";
@@ -82,7 +83,8 @@ export const projectRouter = createTRPCRouter({
   getQuestions: privateProcedure
     .input(getProjectIdSchema)
     .query(
-      async ({ input }) => await getQuestionsByProjectId(input?.projectId),
+      async ({ input, ctx }) =>
+        await getQuestionsByProjectId(input?.projectId, ctx.user.userId!),
     ),
   getQuestionsByUserId: privateProcedure.query(
     async ({ ctx }) => await getQuestionsByUserId(ctx.user.userId!),
@@ -115,6 +117,12 @@ export const projectRouter = createTRPCRouter({
     .query(
       async ({ input }) =>
         await getMeetingTranscriptsByMeetingId(input?.meetingId),
+    ),
+  getMeetingsUserHasAccessTo: privateProcedure
+    .input(getProjectIdSchema)
+    .query(
+      async ({ input, ctx }) =>
+        await getMeetingsByUserId(ctx.user.userId!, input?.projectId),
     ),
   deleteMeeting: privateProcedure
     .input(getMeetingIdSchema)

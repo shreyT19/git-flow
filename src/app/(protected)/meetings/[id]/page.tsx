@@ -3,11 +3,11 @@ import React from "react";
 import TranscriptsList from "../../../../components/modules/meetings/transcripts-list";
 
 type Props = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
-const MeetingDetailsPage = ({ params }: Props) => {
-  const { id: meetingId } = params;
+const MeetingDetailsPage = async ({ params }: Props) => {
+  const { id: meetingId } = await params;
 
   return (
     <div>

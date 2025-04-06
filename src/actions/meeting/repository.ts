@@ -90,3 +90,17 @@ export const deleteMeeting = async (id: string) =>
 
 export const getMeetingTranscriptsByMeetingId = async (meetingId: string) =>
   await db.meetingTranscript.findMany({ where: { meetingId } });
+
+export const getMeetingsByUserId = async (userId: string, projectId: string) =>
+  await db.meeting.findMany({
+    where: {
+      projectId,
+      project: {
+        userToProjects: {
+          some: {
+            userId,
+          },
+        },
+      },
+    },
+  });

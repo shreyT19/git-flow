@@ -1,98 +1,108 @@
 "use client";
-import useProject from "@/services/project";
+import React, { useState } from "react";
 import { api } from "@/trpc/react";
-import React from "react";
-import MeetingCard from "../projects/[id]/_layout/tabs/meetings";
-import { Loader2 } from "lucide-react";
-import ConditionalWrapper from "@/components/global/ConditionalWrapper";
-import Link from "next/link";
 import { EMeetingStatus } from "@prisma/client";
-import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import DataTable from "@/components/global/Datatable";
+import { SlideUpDiv } from "@/components/global/MotionTag";
+import { TitleDescriptionBox } from "@/components/global/Layouts/title-description-box";
+import useProject from "@/services/project";
 
 const MeetingsPage = () => {
   const { selectedProjectId: projectId } = useProject();
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const { data: meetings, isLoading } = api.project.getMeetings.useQuery(
+  const {
+    data: meetings,
+    isLoading,
+    refetch: refetchMeetings,
+  } = api.project.getMeetingsUserHasAccessTo.useQuery(
     { projectId },
     { refetchInterval: 4000 }, //* Refetch every 4 seconds to check if the meeting has been processed or not
   );
 
-  const { mutate: deleteMeeting, isPending } =
-    api.project.deleteMeeting.useMutation();
+  const filteredMeetings = meetings?.filter((meeting) =>
+    meeting.name.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
 
   return (
-    <div className="mt-3 flex h-full flex-col gap-3">
-      <MeetingCard />
-      <div className="flex flex-col gap-4">
-        <h1 className="text-lg font-semibold text-primary">Meetings</h1>
-      </div>
-      <ConditionalWrapper show={isLoading}>
-        <div className="mt-3 flex h-full w-full items-center justify-center">
-          <Loader2 className="size-10 animate-spin" />
-        </div>
-      </ConditionalWrapper>
-      <ConditionalWrapper
-        className="mt-3 flex h-full w-full items-center justify-center"
-        show={meetings?.length === 0}
-      >
-        <div className="mt-3 flex h-full w-full items-center justify-center">
-          <p className="text-sm text-muted-foreground">No meetings found</p>
-        </div>
-      </ConditionalWrapper>
-      <ConditionalWrapper
-        show={!isLoading}
-        className="flex flex-col gap-3 divide-y divide-gray-200"
-      >
-        {meetings?.map((meeting, index) => (
-          <li
-            key={index}
-            className="flex items-center justify-between gap-x-6 py-5"
-          >
-            <div>
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <Link
-                    href={`/meetings/${meeting.id}`}
-                    target="_blank"
-                    className="text-sm font-semibold text-blue-600 hover:underline"
-                  >
-                    {meeting.name}
-                  </Link>
-                  <ConditionalWrapper
-                    show={meeting.status === EMeetingStatus.PROCESSING}
-                  >
-                    <Badge className="bg-yellow-500 text-white">
-                      Processing...
-                    </Badge>
-                  </ConditionalWrapper>
-                </div>
+    <SlideUpDiv className="container mx-auto space-y-6 py-8">
+      <TitleDescriptionBox
+        title="Meetings"
+        titleAs="h1"
+        description="View and manage all your meetings"
+      />
+
+      <DataTable
+        data={filteredMeetings || []}
+        columns={[
+          {
+            header: "Meeting Name",
+            accessorKey: "name",
+            cell: (info) => (
+              <div className="flex items-center gap-2">
+                <span className="font-medium">{info.getValue() as string}</span>
+                {info.row.original.status === EMeetingStatus.PROCESSING && (
+                  <Badge className="bg-yellow-500 text-white">
+                    Processing...
+                  </Badge>
+                )}
               </div>
-              <div className="mt-1 flex items-center gap-x-2 text-xs text-gray-500">
-                <div className="whitespace-nowrap">
-                  {meeting?.createdAt.toLocaleDateString()}
-                </div>
-                <div className="truncate">
-                  {meeting?.meetingTranscripts?.length} Transcripts
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center gap-x-2">
-              <Link href={`/meetings/${meeting.id}`} target="_blank">
-                <Button variant="outline">View Meeting</Button>
-              </Link>
-              {/* <Button
-                variant="destructive"
-                disabled={isPending}
-                onClick={() => deleteMeeting({ meetingId: meeting.id })}
+            ),
+          },
+          {
+            header: "Project",
+            accessorKey: "projectId",
+            cell: (info) => (
+              <Link
+                href={`/projects/${info.getValue()}`}
+                className="font-medium text-primary hover:underline"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent the row click event from firing
+                }}
               >
-                Delete Meeting
-              </Button> */}
-            </div>
-          </li>
-        ))}
-      </ConditionalWrapper>
-    </div>
+                View Project
+              </Link>
+            ),
+          },
+          {
+            header: "Created At",
+            accessorKey: "createdAt",
+            meta: { type: "date" },
+          },
+          {
+            header: "Actions",
+            id: "actions",
+            cell: (info) => (
+              <Link href={`/meetings/${info.row.original.id}`}>
+                <Button variant="outline" size="sm">
+                  View Meeting
+                </Button>
+              </Link>
+            ),
+          },
+        ]}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        onRefresh={refetchMeetings}
+        emptyStateProps={{
+          searchText: "No meetings found matching your search.",
+          defaultText: "No meetings found. Upload a meeting to get started!",
+          searchAction: {
+            label: "Clear search",
+            onClick: () => setSearchQuery(""),
+          },
+        }}
+        onRowClick={(row) => {
+          window.open(`/meetings/${row.id}`, "_blank");
+        }}
+        isLoading={isLoading}
+      />
+    </SlideUpDiv>
   );
 };
 

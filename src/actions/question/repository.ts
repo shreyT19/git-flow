@@ -26,10 +26,11 @@ export const saveAnswer = async (userId: string, question: IQuestionBase) => {
  * @param projectId - The project's ID
  * @returns The questions
  */
-export const getQuestionsByProjectId = async (projectId: string) => {
+export const getQuestionsByProjectId = async (projectId: string, userId: string) => {
   return await db.question.findMany({
     where: {
       projectId: projectId,
+      userId: userId,
     },
     orderBy: {
       createdAt: "desc",
