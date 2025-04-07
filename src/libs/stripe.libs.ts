@@ -16,7 +16,6 @@ export const createCheckoutSession = async (credits: number) => {
   }
 
   const session = await stripe.checkout.sessions.create({
-    customer: userId,
     payment_method_types: ["card"],
     line_items: [
       {
@@ -34,6 +33,7 @@ export const createCheckoutSession = async (credits: number) => {
     success_url: `${process.env.NEXT_PUBLIC_APP_URL}/billing`,
     cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/billing`,
     customer_creation: "always",
+    client_reference_id: userId.toString(),
     metadata: {
       userId,
       credits,

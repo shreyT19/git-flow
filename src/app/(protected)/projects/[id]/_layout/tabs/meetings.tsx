@@ -20,14 +20,11 @@ const MeetingsTab = ({ project }: { project: IProjectResponse }) => {
 };
 
 const ProjectMeetings = ({ projectId }: { projectId: string }) => {
-  const {
-    data: meetings,
-    isLoading,
-    refetch: refetchMeetingsForProject,
-  } = api.project.getMeetingsByProjectId.useQuery(
-    { projectId },
-    { refetchInterval: 4000 }, //* Refetch every 4 seconds to check if the meeting has been processed or not
-  );
+  const { data: meetings, isLoading } =
+    api.project.getMeetingsByProjectId.useQuery(
+      { projectId },
+      { refetchInterval: 4000 }, //* Refetch every 4 seconds to check if the meeting has been processed or not
+    );
 
   return (
     <div className="mt-3 flex h-full flex-col gap-3">
@@ -61,14 +58,6 @@ const ProjectMeetings = ({ projectId }: { projectId: string }) => {
         visible={meetings?.length === 0 && !isLoading}
         icon="presentation"
         text="Upload a meeting to see it here"
-        actions={[
-          {
-            children: "Refresh Meetings",
-            onClick: () => refetchMeetingsForProject(),
-            iconPlacement: "left",
-            icon: "refresh",
-          },
-        ]}
       />
       <ConditionalWrapper
         show={Boolean(!isLoading && meetings && meetings.length > 0)}

@@ -33,7 +33,7 @@ import {
   getMeetingTranscriptsByMeetingId,
   uploadMeeting,
 } from "@/actions/meeting/repository";
-import { getTeamMembers } from "@/actions/user/repository";
+import { getTeamMembers, getUserCredits } from "@/actions/user/repository";
 
 export const projectRouter = createTRPCRouter({
   getTeamMembers: privateProcedure
@@ -132,5 +132,8 @@ export const projectRouter = createTRPCRouter({
     .mutation(async ({ input }) => await unarchiveProject(input?.projectId)),
   getArchivedProjects: privateProcedure.query(
     async ({ ctx }) => await getArchivedProjectsByUserId(ctx.user.userId!),
+  ),
+  getUserCredits: privateProcedure.query(
+    async ({ ctx }) => await getUserCredits(ctx.user.userId!),
   ),
 });

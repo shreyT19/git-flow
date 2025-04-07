@@ -83,3 +83,68 @@ export const getTeamMembers = async (projectId: string) => {
     },
   })) as IUserResponse[];
 };
+
+/**
+ *  Get the credits for a user
+ *  Returns the user object with the credits
+ * @param userId
+ * @returns
+ */
+export const getUserCredits = async (userId: string) => {
+  return await db.user.findUnique({
+    where: { id: userId },
+    select: { credits: true },
+  });
+};
+
+/**
+ *  Get all credit transactions for a user
+ *  Returns an array of credit transaction objects
+ * @param userId
+ * @returns
+ */
+export const getCreditTransactions = async (userId: string) => {
+  return await db.creditTransaction.findMany({
+    where: { userId },
+  });
+};
+
+/**
+ * Create a credit transaction
+ *
+ * @param userId
+ * @param amount
+ * @param description
+ * @returns
+ */
+export const createCreditTransaction = async (
+  userId: string,
+  credits: number,
+  transactionId: string,
+) => {
+  return await db.creditTransaction.create({
+    data: {
+      userId,
+      credits,
+      transactionId: transactionId,
+    },
+  });
+};
+
+/**
+ * Update the credits for a user
+ *
+ * @param userId
+ * @param credits
+ * @returns
+ */
+export const updateUserCredits = async (userId: string, credits: number) => {
+  return await db.user.update({
+    where: { id: userId },
+    data: {
+      credits: {
+        increment: credits,
+      },
+    },
+  });
+};

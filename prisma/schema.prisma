@@ -156,7 +156,8 @@ model CreditTransaction{
     user User @relation(fields:[userId],references:[id])
 
     credits Int
-    transactionType ETransactionType
+    transactionType ETransactionType? @default(PURCHASE)
+    transactionId String?
 }
 
 enum ETransactionType{
