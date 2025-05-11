@@ -2,6 +2,15 @@
 
 A modern web application for automating Git workflows and repository management.
 
+
+## Information Architecture
+
+
+![WhatsApp Image 2025-05-11 at 3 02 35 PM](https://github.com/user-attachments/assets/ebaf73f7-5609-4f70-81f9-2a69f42660a1)
+![WhatsApp Image 2025-05-11 at 3 02 35 PM (1)](https://github.com/user-attachments/assets/fb3df708-75f6-4fb2-be21-081d339d0f51)
+![WhatsApp Image 2025-05-11 at 3 02 36 PM](https://github.com/user-attachments/assets/6edb1fda-8767-4806-be19-23116dbf1dd1)
+
+
 ## 🚀 Tech Stack
 
 ### Frontend
